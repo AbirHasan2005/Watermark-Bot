@@ -6,8 +6,11 @@ A Telegram Video Watermark Adder Bot by [@AbirHasan2005](https://github.com/Abir
 - Auto Resize Watermark According to Video quality.
 - Easy Apply saved watermark to video.
 - Progress of all tasks.
-- Can Choose FFMPEG Process Preset.
+- Can Choose [FFMPEG](https://www.ffmpeg.org/) Process Preset.
 - Can Cancel Process. *(Beta)*
+- Any Channel or Group Force Sub.
+- Logs Process in any channel.
+- Broadcast Feature.
 
 ### Demo Bot:
 <a href="https://t.me/VideoWatermark_Bot"><img src="https://img.shields.io/badge/Demo-Telegram%20Bot-blue.svg?logo=telegram"></a>
