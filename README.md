@@ -24,6 +24,8 @@ A Telegram Video Watermark Adder Bot by [@AbirHasan2005](https://github.com/Abir
 - `OWNER_ID` - Bot Owner UserID
 - `DATABASE_URL` - MongoDB Database URI
 - `UPDATES_CHANNEL` - Force Sub Channel ID *(Optional)*
+- `PRESET` - Video Encoding Preset Type *(Optional)*
+	- Better put `ultrafast` or `superfast` or `veryfast`
 
 ## Commands:
 ```

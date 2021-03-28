@@ -31,10 +31,15 @@
         },
         "UPDATES_CHANNEL": {
             "description": "ID of a Channel which you want to do Force Sub to use the bot. Example: -100123456789",
-            "required": true
+            "required": false
         },
         "LOG_CHANNEL": {
             "description": "Logs Channel ID for some Tracking XD. Example: -100123456789"
+        },
+        "PRESET": {
+            "description": "Video Encoding Preset Type. Better put ultrafast or superfast or veryfast (Optional)",
+            "required": false,
+            "value": "ultrafast"
         }
     },
     "buildpacks": [
