@@ -65,7 +65,7 @@ async def VidWatermarkSaver(bot, cmd):
 	await delete_trash(the_media)
 	## --- Done --- ##
 	await editable.delete()
-	await cmd.reply_text("This Saved as Next Video Watermark!\n\nNow Reply to any Video with /add_watermark to start adding Watermark to the Video!")
+	await cmd.reply_text("This Saved as Next Video Watermark!\n\nNow Send any Video to start adding Watermark to the Video!")
 
 
 @AHBot.on_message(filters.document | filters.video & filters.private)
