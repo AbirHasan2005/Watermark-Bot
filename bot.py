@@ -68,7 +68,11 @@ async def HelpWatermark(bot, cmd):
 			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
 		)
 	if Config.UPDATES_CHANNEL:
-		invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
+		try:
+			invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
+		except FloodWait as e:
+			await asyncio.sleep(e.x)
+			return
 		try:
 			user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.from_user.id)
 			if user.status == "kicked":
