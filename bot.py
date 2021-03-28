@@ -41,21 +41,15 @@ async def HelpWatermark(bot, cmd):
 		disable_web_page_preview=True
 	)
 
-@AHBot.on_message(filters.command("set_watermark") & filters.private)
+@AHBot.on_message(filters.photo & filters.private)
 async def VidWatermarkSaver(bot, cmd):
-	if not cmd.reply_to_message:
-		await cmd.reply_text("Reply to any image to save it as Watermark!")
-		return
-	if not cmd.reply_to_message.photo:
-		await cmd.reply_text("Reply to any image to save it as Watermark!")
-		return
 	editable = await cmd.reply_text("Downloading Image ...")
 	dl_loc = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/"
 	watermark_path = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/thumb.jpg"
 	await asyncio.sleep(5)
 	c_time = time.time()
 	the_media = await bot.download_media(
-		message=cmd.reply_to_message,
+		message=cmd,
 		file_name=dl_loc,
 		progress=progress_for_pyrogram,
 		progress_args=(
@@ -71,10 +65,10 @@ async def VidWatermarkSaver(bot, cmd):
 	await delete_trash(the_media)
 	## --- Done --- ##
 	await editable.delete()
-	await cmd.reply_to_message.reply_text("This Saved as Next Video Watermark!\n\nNow Reply to any Video with /add_watermark to start adding Watermark to the Video!")
+	await cmd.reply_text("This Saved as Next Video Watermark!\n\nNow Reply to any Video with /add_watermark to start adding Watermark to the Video!")
 
 
-@AHBot.on_message(filters.command("add_watermark") | filters.command("add_watermark@AHToolsBot"))
+@AHBot.on_message(filters.document | filters.video & filters.private)
 async def VidWatermarkAdder(bot, cmd):
 	## --- Noobie Process --- ##
 	working_dir = Config.DOWN_PATH + "/WatermarkAdder/"
@@ -84,10 +78,7 @@ async def VidWatermarkAdder(bot, cmd):
 	if not os.path.exists(watermark_path):
 		await cmd.reply_text("You Didn't Set Any Watermark!\n\nReply to any JPG File with /set_watermark ...")
 		return
-	if not cmd.reply_to_message:
-		await cmd.reply_text("Reply to any Video to Start Adding Watermark!")
-		return
-	file_type = cmd.reply_to_message.video or cmd.reply_to_message.document
+	file_type = cmd.video or cmd.document
 	if not file_type.mime_type.startswith("video/"):
 		await cmd.reply_text("This is not a Video!")
 		return
@@ -95,14 +86,7 @@ async def VidWatermarkAdder(bot, cmd):
 	if os.path.exists(status):
 		await cmd.reply_text("Sorry, Currently I am busy with another Task!\n\nTry Again After Sometime!")
 		return
-	preset = "superfast"
-	if len(cmd.command) > 1:
-		if cmd.command[1] == "fast":
-			preset = "ultrafast"
-		elif cmd.command[1] == "slow":
-			preset = "veryfast"
-		else:
-			preset = "superfast"
+	preset = "ultrafast"
 	editable = await cmd.reply_text("Downloading Video ...", parse_mode="Markdown")
 	with open(status, "w") as f:
 		statusMsg = {
@@ -118,12 +102,12 @@ async def VidWatermarkAdder(bot, cmd):
 	user_info = f"**UserID:** #id{cmd.from_user.id}\n**Name:** [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id})"
 	## --- Done --- ##
 	try:
-		forwarded_video = await cmd.reply_to_message.forward(Config.LOG_CHANNEL)
+		forwarded_video = await cmd.forward(Config.LOG_CHANNEL)
 		logs_msg = await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"Download Started!\n\n{user_info}", reply_to_message_id=forwarded_video.message_id, disable_web_page_preview=True, parse_mode="Markdown")
 		await asyncio.sleep(5)
 		c_time = time.time()
 		the_media = await bot.download_media(
-			message=cmd.reply_to_message,
+			message=cmd,
 			file_name=dl_loc,
 			progress=progress_for_pyrogram,
 			progress_args=(
