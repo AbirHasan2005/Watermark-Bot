@@ -299,3 +299,5 @@ async def CancelWatermarkAdder(bot, cmd):
 			await bot.edit_message_text(chat_id=int(statusMsg["chat_id"]), message_id=int(statusMsg["message"]), text="🚦🚦 Last Process Stopped 🚦🚦")
 		except:
 			pass
+
+AHBot.run()
