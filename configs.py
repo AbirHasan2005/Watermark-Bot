@@ -19,7 +19,7 @@ class Config(object):
 Hi, I am Video Watermark Adder Bot!
 
 **How to Added Watermark to a Video?**
-**Usage:** First Reply to a JPG Image/Logo with /set_watermark command, then reply to any Video with /add_watermark `fast`/`slow` command. Better add watermark to a MP4 or MKV Video.
+**Usage:** First Send a JPG Image/Logo, then send any Video. Better add watermark to a MP4 or MKV Video.
 
 __Note: I can only process one video at a time. As my server is Heroku, my health is not good. If you have any issues with Adding Watermark to a Video, then please Report at [Support Group](https://t.me/linux_repo).__
 
