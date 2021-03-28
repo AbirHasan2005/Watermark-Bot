@@ -35,7 +35,7 @@ from database import Database
 from core.display_progress import progress_for_pyrogram, humanbytes
 from humanfriendly import format_timespan
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from pyrogram.errors import InputUserDeactivated
+from pyrogram.errors import InputUserDeactivated, UserIsBlocked
 from pyrogram.errors.exceptions.flood_420 import FloodWait
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, UsernameNotOccupied, ChatAdminRequired, PeerIdInvalid
 
