@@ -16,6 +16,8 @@ class Config(object):
 	CAPTION = "By @AHToolsBot"
 	SESSION_NAME = os.environ.get("SESSION_NAME", "VidWatermarkBot")
 	USAGE_WATERMARK_ADDER = """
+Hi, I am Video Watermark Adder Bot!
+
 **How to Added Watermark to a Video?**
 **Usage:** First Reply to a JPG Image/Logo with /set_watermark command, then reply to any Video with /add_watermark `fast`/`slow` command. Better add watermark to a MP4 or MKV Video.
 
