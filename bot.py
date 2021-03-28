@@ -34,8 +34,9 @@ from configs import Config
 from database import Database
 from core.display_progress import progress_for_pyrogram, humanbytes
 from humanfriendly import format_timespan
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram.errors.exceptions.flood_420 import FloodWait
+from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, UsernameNotOccupied, ChatAdminRequired, PeerIdInvalid
 
 AHBot = Client(Config.BOT_USERNAME, bot_token=Config.BOT_TOKEN, api_id=Config.API_ID, api_hash=Config.API_HASH)
 db = Database(Config.DATABASE_URL, Config.BOT_USERNAME)
@@ -188,6 +189,43 @@ async def VidWatermarkAdder(bot, cmd):
 			Config.LOG_CHANNEL,
 			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
 		)
+	if Config.UPDATES_CHANNEL:
+		invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
+		try:
+			user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.from_user.id)
+			if user.status == "kicked":
+				await bot.send_message(
+					chat_id=cmd.from_user.id,
+					text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/linux_repo).",
+					parse_mode="markdown",
+					disable_web_page_preview=True
+				)
+				return
+		except UserNotParticipant:
+			await bot.send_message(
+				chat_id=cmd.from_user.id,
+				text="**Please Join My Updates Channel to use this Bot!**\n\nDue to Overload, Only Channel Subscribers can use the Bot!",
+				reply_markup=InlineKeyboardMarkup(
+					[
+						[
+							InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
+						],
+						[
+							InlineKeyboardButton("🔄 Refresh 🔄", callback_data="refreshmeh")
+						]
+					]
+				),
+				parse_mode="markdown"
+			)
+			return
+		except Exception:
+			await bot.send_message(
+				chat_id=cmd.from_user.id,
+				text="Something went Wrong. Contact my [Support Group](https://t.me/linux_repo).",
+				parse_mode="markdown",
+				disable_web_page_preview=True
+			)
+			return
 	## --- Noobie Process --- ##
 	working_dir = Config.DOWN_PATH + "/WatermarkAdder/"
 	if not os.path.exists(working_dir):
@@ -261,18 +299,12 @@ async def VidWatermarkAdder(bot, cmd):
 		print(f"Unable to Add Watermark: {err}")
 		await editable.edit("Unable to add Watermark!")
 		await logs_msg.edit(f"#ERROR: Unable to add Watermark!\n\n**Error:** `{err}`")
-		try:
-			await delete_all()
-		except:
-			pass
+		await delete_all()
 		return
 	if output_vid == None:
 		await editable.edit("Something went wrong!")
 		await logs_msg.edit("#ERROR: Something went wrong!")
-		try:
-			await delete_all()
-		except Exception as err:
-			print(err)
+		await delete_all()
 		return
 	await editable.edit("Watermark Added Successfully!\n\nTrying to Upload ...")
 	await logs_msg.edit("Watermark Added Successfully!\n\nTrying to Upload ...")
@@ -477,5 +509,50 @@ async def broadcast_(c, m):
 async def sts(c, m):
 	total_users = await db.total_users_count()
 	await m.reply_text(text=f"**Total Users in DB:** `{total_users}`", parse_mode="Markdown", quote=True)
+
+@AHBot.on_callback_query()
+async def button(bot, cmd: CallbackQuery):
+	cb_data = cmd.data
+	if "refreshmeh" in cb_data:
+		if Config.UPDATES_CHANNEL:
+			invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
+			try:
+				user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.message.chat.id)
+				if user.status == "kicked":
+					await cmd.message.edit(
+						text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/linux_repo).",
+						parse_mode="markdown",
+						disable_web_page_preview=True
+					)
+					return
+			except UserNotParticipant:
+				await cmd.message.edit(
+					text="**You Still Didn't Join ☹️, Please Join My Updates Channel to use this Bot!**\n\nDue to Overload, Only Channel Subscribers can use the Bot!",
+					reply_markup=InlineKeyboardMarkup(
+						[
+							[
+								InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
+							],
+							[
+								InlineKeyboardButton("🔄 Refresh 🔄", callback_data="refreshmeh")
+							]
+						]
+					),
+					parse_mode="markdown"
+				)
+				return
+			except Exception:
+				await cmd.message.edit(
+					text="Something went Wrong. Contact my [Support Group](https://t.me/linux_repo).",
+					parse_mode="markdown",
+					disable_web_page_preview=True
+				)
+				return
+		await cmd.message.edit(
+			text=Config.USAGE_WATERMARK_ADDER,
+			parse_mode="Markdown",
+			reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Developer", url="https://t.me/AbirHasan2005"), InlineKeyboardButton("Support Group", url="https://t.me/linux_repo")], [InlineKeyboardButton("Bots Channel", url="https://t.me/Discovery_Updates")]]),
+			disable_web_page_preview=True
+		)
 
 AHBot.run()
