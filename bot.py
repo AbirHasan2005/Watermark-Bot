@@ -15,25 +15,94 @@ import os
 import json
 import time
 import shutil
+import math
+import json
+import string
+import traceback
 import random
 import asyncio
+import aiofiles
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from PIL import Image
 from datetime import datetime
+from random import choice
 from core.ffmpeg import vidmark, take_screen_shot
 from core.clean import delete_all, delete_trash
 from pyrogram import Client, filters
 from configs import Config
+from database import Database
 from core.display_progress import progress_for_pyrogram, humanbytes
 from humanfriendly import format_timespan
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors.exceptions.flood_420 import FloodWait
 
-AHBot = Client(Config.SESSION_NAME, bot_token=Config.BOT_TOKEN, api_id=Config.API_ID, api_hash=Config.API_HASH)
+AHBot = Client(Config.BOT_USERNAME, bot_token=Config.BOT_TOKEN, api_id=Config.API_ID, api_hash=Config.API_HASH)
+db = Database(Config.DATABASE_URL, Config.BOT_USERNAME)
+broadcast_ids = {}
+
+async def send_msg(user_id, message):
+	try:
+		await message.forward(chat_id=user_id)
+		return 200, None
+	except FloodWait as e:
+		await asyncio.sleep(e.x)
+		return send_msg(user_id, message)
+	except InputUserDeactivated:
+		return 400, f"{user_id} : deactivated\n"
+	except UserIsBlocked:
+		return 400, f"{user_id} : blocked the bot\n"
+	except PeerIdInvalid:
+		return 400, f"{user_id} : user id invalid\n"
+	except Exception as e:
+		return 500, f"{user_id} : {traceback.format_exc()}\n"
+
 
 @AHBot.on_message(filters.command(["start", "help"]) & filters.private)
 async def HelpWatermark(bot, cmd):
+	if not await db.is_user_exist(cmd.from_user.id):
+		await db.add_user(cmd.from_user.id)
+		await bot.send_message(
+			Config.LOG_CHANNEL,
+			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
+		)
+	if Config.UPDATES_CHANNEL:
+		invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
+		try:
+			user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.from_user.id)
+			if user.status == "kicked":
+				await bot.send_message(
+					chat_id=cmd.from_user.id,
+					text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/linux_repo).",
+					parse_mode="markdown",
+					disable_web_page_preview=True
+				)
+				return
+		except UserNotParticipant:
+			await bot.send_message(
+				chat_id=cmd.from_user.id,
+				text="**Please Join My Updates Channel to use this Bot!**\n\nDue to Overload, Only Channel Subscribers can use the Bot!",
+				reply_markup=InlineKeyboardMarkup(
+					[
+						[
+							InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
+						],
+						[
+							InlineKeyboardButton("🔄 Refresh 🔄", callback_data="refreshmeh")
+						]
+					]
+				),
+				parse_mode="markdown"
+			)
+			return
+		except Exception:
+			await bot.send_message(
+				chat_id=cmd.from_user.id,
+				text="Something went Wrong. Contact my [Support Group](https://t.me/linux_repo).",
+				parse_mode="markdown",
+				disable_web_page_preview=True
+			)
+			return
 	await cmd.reply_text(
 		text=Config.USAGE_WATERMARK_ADDER,
 		parse_mode="Markdown",
@@ -43,6 +112,49 @@ async def HelpWatermark(bot, cmd):
 
 @AHBot.on_message(filters.photo & filters.private)
 async def VidWatermarkSaver(bot, cmd):
+	if not await db.is_user_exist(cmd.from_user.id):
+		await db.add_user(cmd.from_user.id)
+		await bot.send_message(
+			Config.LOG_CHANNEL,
+			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
+		)
+	if Config.UPDATES_CHANNEL:
+		invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
+		try:
+			user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.from_user.id)
+			if user.status == "kicked":
+				await bot.send_message(
+					chat_id=cmd.from_user.id,
+					text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/linux_repo).",
+					parse_mode="markdown",
+					disable_web_page_preview=True
+				)
+				return
+		except UserNotParticipant:
+			await bot.send_message(
+				chat_id=cmd.from_user.id,
+				text="**Please Join My Updates Channel to use this Bot!**\n\nDue to Overload, Only Channel Subscribers can use the Bot!",
+				reply_markup=InlineKeyboardMarkup(
+					[
+						[
+							InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
+						],
+						[
+							InlineKeyboardButton("🔄 Refresh 🔄", callback_data="refreshmeh")
+						]
+					]
+				),
+				parse_mode="markdown"
+			)
+			return
+		except Exception:
+			await bot.send_message(
+				chat_id=cmd.from_user.id,
+				text="Something went Wrong. Contact my [Support Group](https://t.me/linux_repo).",
+				parse_mode="markdown",
+				disable_web_page_preview=True
+			)
+			return
 	editable = await cmd.reply_text("Downloading Image ...")
 	dl_loc = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/"
 	watermark_path = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/thumb.jpg"
@@ -70,6 +182,12 @@ async def VidWatermarkSaver(bot, cmd):
 
 @AHBot.on_message(filters.document | filters.video & filters.private)
 async def VidWatermarkAdder(bot, cmd):
+	if not await db.is_user_exist(cmd.from_user.id):
+		await db.add_user(cmd.from_user.id)
+		await bot.send_message(
+			Config.LOG_CHANNEL,
+			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
+		)
 	## --- Noobie Process --- ##
 	working_dir = Config.DOWN_PATH + "/WatermarkAdder/"
 	if not os.path.exists(working_dir):
@@ -263,6 +381,12 @@ async def VidWatermarkAdder(bot, cmd):
 
 @AHBot.on_message(filters.command("cancel") & filters.private) # Also We Can Use [filters.user()]
 async def CancelWatermarkAdder(bot, cmd):
+	if not await db.is_user_exist(cmd.from_user.id):
+		await db.add_user(cmd.from_user.id)
+		await bot.send_message(
+			Config.LOG_CHANNEL,
+			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
+		)
 	if not int(cmd.from_user.id) == Config.OWNER_ID:
 		await cmd.reply_text("You Can't Use That Command!")
 		return
@@ -283,5 +407,75 @@ async def CancelWatermarkAdder(bot, cmd):
 			await bot.edit_message_text(chat_id=int(statusMsg["chat_id"]), message_id=int(statusMsg["message"]), text="🚦🚦 Last Process Stopped 🚦🚦")
 		except:
 			pass
+
+@AHBot.on_message(filters.private & filters.command("broadcast") & filters.user(Config.OWNER_ID) & filters.reply)
+async def broadcast_(c, m):
+	all_users = await db.get_all_users()
+	broadcast_msg = m.reply_to_message
+	while True:
+	    broadcast_id = ''.join([random.choice(string.ascii_letters) for i in range(3)])
+	    if not broadcast_ids.get(broadcast_id):
+	        break
+	out = await m.reply_text(
+	    text = f"Broadcast Started! You will be notified with log file when all the users are notified."
+	)
+	start_time = time.time()
+	total_users = await db.total_users_count()
+	done = 0
+	failed = 0
+	success = 0
+	broadcast_ids[broadcast_id] = dict(
+	    total = total_users,
+	    current = done,
+	    failed = failed,
+	    success = success
+	)
+	async with aiofiles.open('broadcast.txt', 'w') as broadcast_log_file:
+	    async for user in all_users:
+	        sts, msg = await send_msg(
+	            user_id = int(user['id']),
+	            message = broadcast_msg
+	        )
+	        if msg is not None:
+	            await broadcast_log_file.write(msg)
+	        if sts == 200:
+	            success += 1
+	        else:
+	            failed += 1
+	        if sts == 400:
+	            await db.delete_user(user['id'])
+	        done += 1
+	        if broadcast_ids.get(broadcast_id) is None:
+	            break
+	        else:
+	            broadcast_ids[broadcast_id].update(
+	                dict(
+	                    current = done,
+	                    failed = failed,
+	                    success = success
+	                )
+	            )
+	if broadcast_ids.get(broadcast_id):
+	    broadcast_ids.pop(broadcast_id)
+	completed_in = datetime.timedelta(seconds=int(time.time()-start_time))
+	await asyncio.sleep(3)
+	await out.delete()
+	if failed == 0:
+	    await m.reply_text(
+	        text=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.",
+	        quote=True
+	    )
+	else:
+	    await m.reply_document(
+	        document='broadcast.txt',
+	        caption=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.",
+	        quote=True
+	    )
+	await os.remove('broadcast.txt')
+
+@AHBot.on_message(filters.private & filters.command("status") & filters.user(Config.OWNER_ID))
+async def sts(c, m):
+	total_users = await db.total_users_count()
+	await m.reply_text(text=f"**Total Users in DB:** `{total_users}`", parse_mode="Markdown", quote=True)
 
 AHBot.run()

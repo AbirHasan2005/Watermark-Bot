@@ -11,10 +11,12 @@ class Config(object):
 	API_ID = int(os.environ.get("API_ID", 12345))
 	API_HASH = os.environ.get("API_HASH")
 	LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL"))
+	UPDATES_CHANNEL = os.environ.get("UPDATES_CHANNEL")
 	DOWN_PATH = os.environ.get("DOWN_PATH", "./downloads")
 	OWNER_ID = int(os.environ.get("OWNER_ID", 1445283714))
 	CAPTION = "By @AHToolsBot"
-	SESSION_NAME = os.environ.get("SESSION_NAME", "VidWatermarkBot")
+	BOT_USERNAME = os.environ.get("BOT_USERNAME", "VideoWatermark_Bot")
+	DATABASE_URL = os.environ.get("DATABASE_URL")
 	USAGE_WATERMARK_ADDER = """
 Hi, I am Video Watermark Adder Bot!
 
