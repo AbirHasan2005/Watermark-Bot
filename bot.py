@@ -194,7 +194,7 @@ async def VidWatermarkAdder(bot, cmd):
 		os.makedirs(working_dir)
 	watermark_path = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/thumb.jpg"
 	if not os.path.exists(watermark_path):
-		await cmd.reply_text("You Didn't Set Any Watermark!\n\nReply to any JPG File with /set_watermark ...")
+		await cmd.reply_text("You Didn't Set Any Watermark!\n\nSend any JPG or PNG Picture ...")
 		return
 	file_type = cmd.video or cmd.document
 	if not file_type.mime_type.startswith("video/"):
@@ -379,7 +379,7 @@ async def VidWatermarkAdder(bot, cmd):
 	await logs_msg.delete()
 	await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"#WATERMARK_ADDED: Video Uploaded!\n\n{user_info}", reply_to_message_id=forward_vid.message_id)
 
-@AHBot.on_message(filters.command("cancel") & filters.private) # Also We Can Use [filters.user()]
+@AHBot.on_message(filters.command("cancel") & filters.private)
 async def CancelWatermarkAdder(bot, cmd):
 	if not await db.is_user_exist(cmd.from_user.id):
 		await db.add_user(cmd.from_user.id)

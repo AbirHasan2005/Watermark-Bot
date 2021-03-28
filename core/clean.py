@@ -2,6 +2,7 @@
 
 import os
 import shutil
+from configs import Config
 
 async def delete_trash(file):
     try:
