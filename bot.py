@@ -242,7 +242,7 @@ async def VidWatermarkAdder(bot, cmd):
 	if os.path.exists(status):
 		await cmd.reply_text("Sorry, Currently I am busy with another Task!\n\nTry Again After Sometime!")
 		return
-	preset = "ultrafast"
+	preset = Config.PRESET
 	editable = await cmd.reply_text("Downloading Video ...", parse_mode="Markdown")
 	with open(status, "w") as f:
 		statusMsg = {
