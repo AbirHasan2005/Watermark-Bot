@@ -12,6 +12,7 @@ A Telegram Video Watermark Adder Bot by [@AbirHasan2005](https://github.com/Abir
 - Logs Process in any channel.
 - Broadcast Feature.
 - Can Save Watermark Position for users.
+- Can Save Watermark Size for users.
 
 ### Demo Bot:
 <a href="https://t.me/VideoWatermark_Bot"><img src="https://img.shields.io/badge/Demo-Telegram%20Bot-blue.svg?logo=telegram"></a>

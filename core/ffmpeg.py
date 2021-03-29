@@ -26,7 +26,7 @@ from core.display_progress import TimeFormatter
 from pyrogram.errors.exceptions.flood_420 import FloodWait
 
 
-async def vidmark(the_media, message, working_dir, watermark_path, output_vid, total_time, logs_msg, status, mode, position):
+async def vidmark(the_media, message, working_dir, watermark_path, output_vid, total_time, logs_msg, status, mode, position, size):
     file_genertor_command = [
         "ffmpeg",
         "-hide_banner",
@@ -39,7 +39,7 @@ async def vidmark(the_media, message, working_dir, watermark_path, output_vid, t
         "-i",
         watermark_path,
         "-filter_complex",
-        f"[1][0]scale2ref=w='iw*7/100':h='ow/mdar'[wm][vid];[vid][wm]overlay={position}",
+        f"[1][0]scale2ref=w='iw*{size}/100':h='ow/mdar'[wm][vid];[vid][wm]overlay={position}",
         "-c:a",
         "copy",
         "-preset",

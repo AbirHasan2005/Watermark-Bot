@@ -34,3 +34,8 @@ class Database:
     async def get_position(self, id):
         user = await self.col.find_one({'id':int(id)})
         return user.get('watermark_position', '5:5')
+    async def set_size(self, id, watermark_size):
+        await self.col.update_one({'id': id}, {'$set': {'watermark_size': watermark_size}})
+    async def get_size(self, id):
+        user = await self.col.find_one({'id':int(id)})
+        return user.get('watermark_size', '7')

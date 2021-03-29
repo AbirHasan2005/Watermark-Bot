@@ -236,7 +236,7 @@ async def SettingsBot(bot, cmd):
 				disable_web_page_preview=True
 			)
 			return
-
+	## --- Checks --- ##
 	position_tag = None
 	watermark_position = await db.get_position(cmd.from_user.id)
 	if watermark_position == "5:main_h-overlay_h":
@@ -247,6 +247,19 @@ async def SettingsBot(bot, cmd):
 		position_tag = "Top Right"
 	elif watermark_position == "5:5":
 		position_tag = "Top Left"
+
+	size_tag = None
+	watermark_size = await db.get_size(cmd.from_user.id)
+	if int(watermark_size) == 5:
+		size_tag = "5%"
+	elif int(watermark_size) == 7:
+		size_tag = "7%"
+	elif int(watermark_size) == 10:
+		size_tag = "10%"
+	else:
+		size_tag = "7%"
+		watermark_size = "7"
+	## --- Next --- ##
 	await cmd.reply_text(
 		text="Here you can set your Watermark Settings:",
 		disable_web_page_preview=True,
@@ -255,7 +268,9 @@ async def SettingsBot(bot, cmd):
 			[
 				[InlineKeyboardButton(f"Watermark Position - {position_tag}", callback_data="lol")],
 				[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
-				[InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5"), InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5")]
+				[InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5"), InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5")],
+				[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
+				[InlineKeyboardButton("Set 5%", callback_data=f"size_5"), InlineKeyboardButton("Set 7%", callback_data=f"size_7"), InlineKeyboardButton("Set 10%", callback_data=f"size_10")]
 			]
 		)
 	)
@@ -377,6 +392,18 @@ async def VidWatermarkAdder(bot, cmd):
 	else:
 		position_tag = "Top Left"
 		watermark_position = "5:5"
+
+	size_tag = None
+	watermark_size = await db.get_size(cmd.from_user.id)
+	if int(watermark_size) == 5:
+		size_tag = "5%"
+	elif int(watermark_size) == 7:
+		size_tag = "7%"
+	elif int(watermark_size) == 10:
+		size_tag = "10%"
+	else:
+		size_tag = "7%"
+		watermark_size = "7"
 	await editable.edit(f"Trying to Add Watermark to the Video at {position_tag} Corner ...\n\nPlease Wait!")
 	duration = 0
 	metadata = extractMetadata(createParser(the_media))
@@ -389,7 +416,7 @@ async def VidWatermarkAdder(bot, cmd):
 	try:
 		# WOW! Nice XD
 		# Meh Always NOOB
-		output_vid = await vidmark(the_media, editable, progress, watermark_path, output_vid, duration, logs_msg, status, preset, watermark_position)
+		output_vid = await vidmark(the_media, editable, progress, watermark_path, output_vid, duration, logs_msg, status, preset, watermark_position, watermark_size)
 	except Exception as err:
 		print(f"Unable to Add Watermark: {err}")
 		await editable.edit("Unable to add Watermark!")
@@ -663,7 +690,7 @@ async def button(bot, cmd: CallbackQuery):
 	elif "lol" in cb_data:
 		await cmd.answer("Sir, that button not works XD\n\nPress Bottom Buttons to Set Position of Watermark!", show_alert=True)
 
-	elif cb_data.startswith("position_"):
+	elif (cb_data.startswith("position_") or cb_data.startswith("size_")):
 		if Config.UPDATES_CHANNEL:
 			invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
 			try:
@@ -698,9 +725,12 @@ async def button(bot, cmd: CallbackQuery):
 					disable_web_page_preview=True
 				)
 				return
-		await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"#SETTINGS_SET: [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) Changed Settings!\n\nUser ID: #id{cmd.from_user.id}", parse_mode="Markdown", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Ban User", callback_data=f"ban_{cmd.from_user.id}")]]))
+		await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"#SETTINGS_SET: [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) Changed Settings!\n\n**User ID:** #id{cmd.from_user.id}\n**Data:** `{cb_data}`", parse_mode="Markdown", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Ban User", callback_data=f"ban_{cmd.from_user.id}")]]))
 		new_position = cb_data.split("_", 1)[1]
-		await db.set_position(cmd.from_user.id, new_position)
+		if cb_data.startswith("position_"):
+			await db.set_position(cmd.from_user.id, new_position)
+		elif cb_data.startswith("size_"):
+			await db.set_size(cmd.from_user.id, new_position)
 		position_tag = None
 		watermark_position = await db.get_position(cmd.from_user.id)
 		if watermark_position == "5:main_h-overlay_h":
@@ -713,6 +743,18 @@ async def button(bot, cmd: CallbackQuery):
 			position_tag = "Top Left"
 		else:
 			position_tag = "Top Left"
+
+		size_tag = None
+		watermark_size = await db.get_size(cmd.from_user.id)
+		if int(watermark_size) == 5:
+			size_tag = "5%"
+		elif int(watermark_size) == 7:
+			size_tag = "7%"
+		elif int(watermark_size) == 10:
+			size_tag = "10%"
+		else:
+			size_tag = "7%"
+			watermark_size = "7"
 		await cmd.message.edit(
 			text="Here you can set your Watermark Settings:",
 			disable_web_page_preview=True,
@@ -721,7 +763,9 @@ async def button(bot, cmd: CallbackQuery):
 				[
 					[InlineKeyboardButton(f"Watermark Position - {position_tag}", callback_data="lol")],
 					[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
-					[InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5"), InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5")]
+					[InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5"), InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5")],
+					[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
+					[InlineKeyboardButton("Set 5%", callback_data=f"size_5"), InlineKeyboardButton("Set 7%", callback_data=f"size_7"), InlineKeyboardButton("Set 10%", callback_data=f"size_10")]
 				]
 			)
 		)
