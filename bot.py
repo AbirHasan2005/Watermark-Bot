@@ -511,10 +511,18 @@ async def broadcast_(c, m):
 	    )
 	await os.remove('broadcast.txt')
 
-@AHBot.on_message(filters.private & filters.command("status") & filters.user(Config.OWNER_ID))
+@AHBot.on_message(filters.private & filters.command("status"))
 async def sts(c, m):
-	total_users = await db.total_users_count()
-	await m.reply_text(text=f"**Total Users in DB:** `{total_users}`", parse_mode="Markdown", quote=True)
+	msg_text = None
+	status = Config.DOWN_PATH + "/WatermarkAdder/status.json"
+	if os.path.exists(status):
+		msg_text = "Sorry, Currently I am busy with another Task!"
+	else:
+		msg_text = "I am Free Now!\nSend me any video to add Watermark."
+	if int(m.from_user.id) == Config.OWNER_ID:
+		total_users = await db.total_users_count()
+		msg_text += f"\n\n**Total Users in DB:** `{total_users}`"
+	await m.reply_text(text=msg_text, parse_mode="Markdown", quote=True)
 
 @AHBot.on_callback_query()
 async def button(bot, cmd: CallbackQuery):
