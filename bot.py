@@ -267,8 +267,8 @@ async def SettingsBot(bot, cmd):
 		reply_markup=InlineKeyboardMarkup(
 			[
 				[InlineKeyboardButton(f"Watermark Position - {position_tag}", callback_data="lol")],
+				[InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5"), InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5")],
 				[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
-				[InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5"), InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5")],
 				[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
 				[InlineKeyboardButton("Set 5%", callback_data=f"size_5"), InlineKeyboardButton("Set 7%", callback_data=f"size_7"), InlineKeyboardButton("Set 10%", callback_data=f"size_10")]
 			]
@@ -690,6 +690,9 @@ async def button(bot, cmd: CallbackQuery):
 	elif "lol" in cb_data:
 		await cmd.answer("Sir, that button not works XD\n\nPress Bottom Buttons to Set Position of Watermark!", show_alert=True)
 
+	elif "lel" in cb_data:
+		await cmd.answer("Sir, that button not works XD\n\nPress Bottom Buttons to Set Size of Watermark", show_alert=True)
+
 	elif (cb_data.startswith("position_") or cb_data.startswith("size_")):
 		if Config.UPDATES_CHANNEL:
 			invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
@@ -762,8 +765,8 @@ async def button(bot, cmd: CallbackQuery):
 			reply_markup=InlineKeyboardMarkup(
 				[
 					[InlineKeyboardButton(f"Watermark Position - {position_tag}", callback_data="lol")],
+					[InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5"), InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5")],
 					[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
-					[InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5"), InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5")],
 					[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
 					[InlineKeyboardButton("Set 5%", callback_data=f"size_5"), InlineKeyboardButton("Set 7%", callback_data=f"size_7"), InlineKeyboardButton("Set 10%", callback_data=f"size_10")]
 				]
