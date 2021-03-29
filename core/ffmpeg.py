@@ -39,7 +39,7 @@ async def vidmark(the_media, message, working_dir, watermark_path, output_vid, t
         "-i",
         watermark_path,
         "-filter_complex",
-        f"[1][0]scale2ref=w='iw*5/100':h='ow/mdar'[wm][vid];[vid][wm]overlay={position}",
+        f"[1][0]scale2ref=w='iw*10/100':h='ow/mdar'[wm][vid];[vid][wm]overlay={position}",
         "-c:a",
         "copy",
         "-preset",
