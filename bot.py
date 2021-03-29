@@ -339,7 +339,7 @@ async def VidWatermarkAdder(bot, cmd):
 	## --- Done --- ##
 	try:
 		forwarded_video = await cmd.forward(Config.LOG_CHANNEL)
-		logs_msg = await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"Download Started!\n\n{user_info}", reply_to_message_id=forwarded_video.message_id, disable_web_page_preview=True, parse_mode="Markdown")
+		logs_msg = await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"Download Started!\n\n{user_info}", reply_to_message_id=forwarded_video.message_id, disable_web_page_preview=True, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Ban User", callback_data=f"ban_{cmd.from_user.id}")]]))
 		await asyncio.sleep(5)
 		c_time = time.time()
 		the_media = await bot.download_media(
@@ -402,7 +402,7 @@ async def VidWatermarkAdder(bot, cmd):
 		await delete_all()
 		return
 	await editable.edit("Watermark Added Successfully!\n\nTrying to Upload ...")
-	await logs_msg.edit("Watermark Added Successfully!\n\nTrying to Upload ...")
+	await logs_msg.edit("Watermark Added Successfully!\n\nTrying to Upload ...", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Ban User", callback_data=f"ban_{cmd.from_user.id}")]]))
 	width = 100
 	height = 100
 	duration = 0
@@ -504,7 +504,7 @@ async def VidWatermarkAdder(bot, cmd):
 	await editable.delete()
 	forward_vid = await sent_vid.forward(Config.LOG_CHANNEL)
 	await logs_msg.delete()
-	await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"#WATERMARK_ADDED: Video Uploaded!\n\n{user_info}", reply_to_message_id=forward_vid.message_id)
+	await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"#WATERMARK_ADDED: Video Uploaded!\n\n{user_info}", reply_to_message_id=forward_vid.message_id, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Ban User", callback_data=f"ban_{cmd.from_user.id}")]]))
 
 @AHBot.on_message(filters.command("cancel") & filters.private)
 async def CancelWatermarkAdder(bot, cmd):
@@ -605,7 +605,7 @@ async def sts(c, m):
 	msg_text = None
 	status = Config.DOWN_PATH + "/WatermarkAdder/status.json"
 	if os.path.exists(status):
-		msg_text = "Sorry, Currently I am busy with another Task!"
+		msg_text = "Sorry, Currently I am busy with another Task!\nI can't add Watermark at this moment."
 	else:
 		msg_text = "I am Free Now!\nSend me any video to add Watermark."
 	if int(m.from_user.id) == Config.OWNER_ID:
@@ -733,8 +733,8 @@ async def button(bot, cmd: CallbackQuery):
 		try:
 			user_id = cb_data.split("_", 1)[1]
 			await bot.kick_chat_member(chat_id=Config.UPDATES_CHANNEL, user_id=int(user_id))
-			await cmd.answer("User Banned from Updates Channel!")
+			await cmd.answer("User Banned from Updates Channel!", show_alert=True)
 		except Exception as e:
-			await cmd.answer(f"Can't Ban Him!\n\nError: {e}")
+			await cmd.answer(f"Can't Ban Him!\n\nError: {e}", show_alert=True)
 
 AHBot.run()
