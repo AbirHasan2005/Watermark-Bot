@@ -26,7 +26,7 @@ from core.display_progress import TimeFormatter
 from pyrogram.errors.exceptions.flood_420 import FloodWait
 
 
-async def vidmark(the_media, message, working_dir, watermark_path, output_vid, total_time, logs_msg, status, mode):
+async def vidmark(the_media, message, working_dir, watermark_path, output_vid, total_time, logs_msg, status, mode, position):
     file_genertor_command = [
         "ffmpeg",
         "-hide_banner",
@@ -39,7 +39,7 @@ async def vidmark(the_media, message, working_dir, watermark_path, output_vid, t
         "-i",
         watermark_path,
         "-filter_complex",
-        "[1][0]scale2ref=w='iw*5/100':h='ow/mdar'[wm][vid];[vid][wm]overlay=5:5",
+        f"[1][0]scale2ref=w='iw*5/100':h='ow/mdar'[wm][vid];[vid][wm]overlay={position}",
         "-c:a",
         "copy",
         "-preset",
@@ -93,7 +93,7 @@ async def vidmark(the_media, message, working_dir, watermark_path, output_vid, t
                 ''.join(["░" for i in range(10 - math.floor(percentage / 10))])
                 )
             stats = f'📦️ **Adding Watermark [Preset: `{mode}`]**\n\n' \
-                    f'⏰️ **ETA:** `{ETA}`\n🔰 **PID:** `{process.pid}`\n🔄 **Duration: `{format_timespan(total_time)}`**\n\n' \
+                    f'⏰️ **ETA:** `{ETA}`\nPosition: `{position}`\n🔰 **PID:** `{process.pid}`\n🔄 **Duration: `{format_timespan(total_time)}`**\n\n' \
                     f'{progress_str}\n'
             try:
                 await logs_msg.edit(text=stats)
