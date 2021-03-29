@@ -37,7 +37,7 @@ from humanfriendly import format_timespan
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram.errors import InputUserDeactivated, UserIsBlocked
 from pyrogram.errors.exceptions.flood_420 import FloodWait
-from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, UsernameNotOccupied, ChatAdminRequired, PeerIdInvalid
+from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, UsernameNotOccupied, ChatAdminRequired, PeerIdInvalid, MessageNotModified
 
 AHBot = Client(Config.BOT_USERNAME, bot_token=Config.BOT_TOKEN, api_id=Config.API_ID, api_hash=Config.API_HASH)
 db = Database(Config.DATABASE_URL, Config.BOT_USERNAME)
@@ -758,20 +758,23 @@ async def button(bot, cmd: CallbackQuery):
 		else:
 			size_tag = "7%"
 			watermark_size = "7"
-		await cmd.message.edit(
-			text="Here you can set your Watermark Settings:",
-			disable_web_page_preview=True,
-			parse_mode="Markdown",
-			reply_markup=InlineKeyboardMarkup(
-				[
-					[InlineKeyboardButton(f"Watermark Position - {position_tag}", callback_data="lol")],
-					[InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5"), InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5")],
-					[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
-					[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
-					[InlineKeyboardButton("Set 5%", callback_data=f"size_5"), InlineKeyboardButton("Set 7%", callback_data=f"size_7"), InlineKeyboardButton("Set 10%", callback_data=f"size_10")]
-				]
+		try:
+			await cmd.message.edit(
+				text="Here you can set your Watermark Settings:",
+				disable_web_page_preview=True,
+				parse_mode="Markdown",
+				reply_markup=InlineKeyboardMarkup(
+					[
+						[InlineKeyboardButton(f"Watermark Position - {position_tag}", callback_data="lol")],
+						[InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5"), InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5")],
+						[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
+						[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
+						[InlineKeyboardButton("Set 5%", callback_data=f"size_5"), InlineKeyboardButton("Set 7%", callback_data=f"size_7"), InlineKeyboardButton("Set 10%", callback_data=f"size_10")]
+					]
+				)
 			)
-		)
+		except MessageNotModified:
+			pass
 
 	elif cb_data.startswith("ban_"):
 		if Config.UPDATES_CHANNEL == None:
