@@ -29,7 +29,7 @@ A Telegram Video Watermark Adder Bot by [@AbirHasan2005](https://github.com/Abir
 - `PRESET` - Video Encoding Preset Type *(Optional)*
 	- Better put `ultrafast` or `superfast` or `veryfast`
 
-## Commands:
+## @BotFather Commands:
 ```
 start - start the bot
 status - Show number of users in DB
@@ -40,7 +40,21 @@ broadcast - Broadcast replied message to DB Users
 <a href="https://t.me/linux_repo"><img src="https://img.shields.io/badge/Telegram-Join%20Telegram%20Group-blue.svg?logo=telegram"></a>
 
 ### Deploy Now:
+
+#### Easiest Way [Deploy To Heroku] 😪
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/AbirHasan2005/Watermark-Bot)
+
+#### The Hard Way 🤕
+```sh
+git clone https://github.com/AbirHasan2005/Watermark-Bot
+cd Watermark-Bot
+virtualenv -p python3 VENV
+. ./VENV/bin/activate
+pip install -r requirements.txt
+--- EDIT configs.py values appropriately ---
+python3 bot.py
+```
 
 ### Follow on:
 <p align="left">
