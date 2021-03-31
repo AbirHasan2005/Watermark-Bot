@@ -119,86 +119,6 @@ async def HelpWatermark(bot, cmd):
 		disable_web_page_preview=True
 	)
 
-@AHBot.on_message(filters.photo | filters.document & filters.private)
-async def VidWatermarkSaver(bot, cmd):
-	if not await db.is_user_exist(cmd.from_user.id):
-		await db.add_user(cmd.from_user.id)
-		await bot.send_message(
-			Config.LOG_CHANNEL,
-			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
-		)
-	if Config.UPDATES_CHANNEL:
-		invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
-		try:
-			user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.from_user.id)
-			if user.status == "kicked":
-				await bot.send_message(
-					chat_id=cmd.from_user.id,
-					text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/linux_repo).",
-					parse_mode="markdown",
-					disable_web_page_preview=True
-				)
-				return
-		except UserNotParticipant:
-			await bot.send_message(
-				chat_id=cmd.from_user.id,
-				text="**Please Join My Updates Channel to use this Bot!**\n\nDue to Overload, Only Channel Subscribers can use the Bot!",
-				reply_markup=InlineKeyboardMarkup(
-					[
-						[
-							InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
-						],
-						[
-							InlineKeyboardButton("🔄 Refresh 🔄", callback_data="refreshmeh")
-						]
-					]
-				),
-				parse_mode="markdown"
-			)
-			return
-		except Exception:
-			await bot.send_message(
-				chat_id=cmd.from_user.id,
-				text="Something went Wrong. Contact my [Support Group](https://t.me/linux_repo).",
-				parse_mode="markdown",
-				disable_web_page_preview=True
-			)
-			return
-	if cmd.document:
-		if not cmd.document.mime_type.startswith("image/"):
-			await cmd.reply_text("This is not a Photo!")
-			return
-	else:
-		pass
-	editable = await cmd.reply_text("Downloading Image ...")
-	dl_loc = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/"
-	watermark_path = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/thumb.jpg"
-	await asyncio.sleep(5)
-	c_time = time.time()
-	the_media = await bot.download_media(
-		message=cmd,
-		file_name=watermark_path,
-		progress=progress_for_pyrogram,
-		progress_args=(
-			"Downloading Sir ...",
-			editable,
-			c_time
-		)
-	)
-	## --- Resizer --- ##
-	# try:
-	# 	image = Image.open(the_media)
-	# 	new_image = image.resize((sys.maxsize, 200), Image.ANTIALIAS)
-	# 	new_image.save(watermark_path)
-	# except Exception as err:
-	# 	print(err)
-	# 	return
-	# await delete_trash(the_media)
-	## --- Done --- ##
-	await editable.delete()
-	await cmd.reply_text("This Saved as Next Video Watermark!\n\nNow Send any Video to start adding Watermark to the Video!")
-
-
 @AHBot.on_message(filters.command("settings") & filters.private)
 async def SettingsBot(bot, cmd):
 	if not await db.is_user_exist(cmd.from_user.id):
@@ -288,7 +208,7 @@ async def SettingsBot(bot, cmd):
 	)
 
 
-@AHBot.on_message(filters.document | filters.video & filters.private)
+@AHBot.on_message(filters.document | filters.video | filters.photo & filters.private)
 async def VidWatermarkAdder(bot, cmd):
 	if not await db.is_user_exist(cmd.from_user.id):
 		await db.add_user(cmd.from_user.id)
@@ -334,6 +254,27 @@ async def VidWatermarkAdder(bot, cmd):
 			)
 			return
 	## --- Noobie Process --- ##
+	if (cmd.photo or (cmd.document and cmd.document.mime_type.startswith("image/"))):
+		editable = await cmd.reply_text("Downloading Image ...")
+		dl_loc = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/"
+		watermark_path = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/thumb.jpg"
+		await asyncio.sleep(5)
+		c_time = time.time()
+		the_media = await bot.download_media(
+			message=cmd,
+			file_name=watermark_path,
+			progress=progress_for_pyrogram,
+			progress_args=(
+				"Downloading Sir ...",
+				editable,
+				c_time
+			)
+		)
+		await editable.delete()
+		await cmd.reply_text("This Saved as Next Video Watermark!\n\nNow Send any Video to start adding Watermark to the Video!")
+		return
+	else:
+		pass
 	working_dir = Config.DOWN_PATH + "/WatermarkAdder/"
 	if not os.path.exists(working_dir):
 		os.makedirs(working_dir)
