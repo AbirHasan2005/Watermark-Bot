@@ -13,6 +13,7 @@
 
 
 import os
+import sys
 import json
 import time
 import shutil
@@ -118,7 +119,7 @@ async def HelpWatermark(bot, cmd):
 		disable_web_page_preview=True
 	)
 
-@AHBot.on_message(filters.photo & filters.private)
+@AHBot.on_message(filters.photo | filters.document & filters.private)
 async def VidWatermarkSaver(bot, cmd):
 	if not await db.is_user_exist(cmd.from_user.id):
 		await db.add_user(cmd.from_user.id)
@@ -163,6 +164,12 @@ async def VidWatermarkSaver(bot, cmd):
 				disable_web_page_preview=True
 			)
 			return
+	if cmd.document:
+		if not file_type.mime_type.startswith("image/"):
+			await cmd.reply_text("This is not a Photo!")
+			return
+	else:
+		pass
 	editable = await cmd.reply_text("Downloading Image ...")
 	dl_loc = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/"
 	watermark_path = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/thumb.jpg"
@@ -170,7 +177,7 @@ async def VidWatermarkSaver(bot, cmd):
 	c_time = time.time()
 	the_media = await bot.download_media(
 		message=cmd,
-		file_name=dl_loc,
+		file_name=watermark_path,
 		progress=progress_for_pyrogram,
 		progress_args=(
 			"Downloading Sir ...",
@@ -179,14 +186,14 @@ async def VidWatermarkSaver(bot, cmd):
 		)
 	)
 	## --- Resizer --- ##
-	try:
-		image = Image.open(the_media)
-		new_image = image.resize((200, 200), Image.ANTIALIAS)
-		new_image.save(watermark_path)
-	except Exception as err:
-		print(err)
-		return
-	await delete_trash(the_media)
+	# try:
+	# 	image = Image.open(the_media)
+	# 	new_image = image.resize((sys.maxsize, 200), Image.ANTIALIAS)
+	# 	new_image.save(watermark_path)
+	# except Exception as err:
+	# 	print(err)
+	# 	return
+	# await delete_trash(the_media)
 	## --- Done --- ##
 	await editable.delete()
 	await cmd.reply_text("This Saved as Next Video Watermark!\n\nNow Send any Video to start adding Watermark to the Video!")
@@ -257,6 +264,10 @@ async def SettingsBot(bot, cmd):
 		size_tag = "7%"
 	elif int(watermark_size) == 10:
 		size_tag = "10%"
+	elif int(watermark_size) == 15:
+		size_tag = "15%"
+	elif int(watermark_size) == 20:
+		size_tag = "20%"
 	else:
 		size_tag = "7%"
 		watermark_size = "7"
@@ -271,7 +282,7 @@ async def SettingsBot(bot, cmd):
 				[InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5"), InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5")],
 				[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
 				[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
-				[InlineKeyboardButton("Set 5%", callback_data=f"size_5"), InlineKeyboardButton("Set 7%", callback_data=f"size_7"), InlineKeyboardButton("Set 10%", callback_data=f"size_10")]
+				[InlineKeyboardButton("5%", callback_data=f"size_5"), InlineKeyboardButton("7%", callback_data=f"size_7"), InlineKeyboardButton("10%", callback_data=f"size_10"), InlineKeyboardButton("15%", callback_data=f"size_15"), InlineKeyboardButton("20%", callback_data=f"size_20")]
 			]
 		)
 	)
@@ -402,6 +413,10 @@ async def VidWatermarkAdder(bot, cmd):
 		size_tag = "7%"
 	elif int(watermark_size) == 10:
 		size_tag = "10%"
+	elif int(watermark_size) == 15:
+		size_tag = "15%"
+	elif int(watermark_size) == 20:
+		size_tag = "20%"
 	else:
 		size_tag = "7%"
 		watermark_size = "7"
@@ -756,6 +771,10 @@ async def button(bot, cmd: CallbackQuery):
 			size_tag = "7%"
 		elif int(watermark_size) == 10:
 			size_tag = "10%"
+		elif int(watermark_size) == 15:
+			size_tag = "15%"
+		elif int(watermark_size) == 20:
+			size_tag = "20%"
 		else:
 			size_tag = "7%"
 			watermark_size = "7"
@@ -770,7 +789,7 @@ async def button(bot, cmd: CallbackQuery):
 						[InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5"), InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5")],
 						[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
 						[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
-						[InlineKeyboardButton("Set 5%", callback_data=f"size_5"), InlineKeyboardButton("Set 7%", callback_data=f"size_7"), InlineKeyboardButton("Set 10%", callback_data=f"size_10")]
+						[InlineKeyboardButton("5%", callback_data=f"size_5"), InlineKeyboardButton("7%", callback_data=f"size_7"), InlineKeyboardButton("10%", callback_data=f"size_10"), InlineKeyboardButton("15%", callback_data=f"size_15"), InlineKeyboardButton("20%", callback_data=f"size_20")]
 					]
 				)
 			)
