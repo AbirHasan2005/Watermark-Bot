@@ -165,7 +165,7 @@ async def VidWatermarkSaver(bot, cmd):
 			)
 			return
 	if cmd.document:
-		if not file_type.mime_type.startswith("image/"):
+		if not cmd.document.mime_type.startswith("image/"):
 			await cmd.reply_text("This is not a Photo!")
 			return
 	else:
