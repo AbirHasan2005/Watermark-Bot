@@ -5,5 +5,6 @@ Pillow
 humanfriendly
 motor
 aiofiles
+aiohttp
 dnspython
 psutil
