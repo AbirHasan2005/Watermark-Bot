@@ -13,6 +13,7 @@ A Telegram Video Watermark Adder Bot by [@AbirHasan2005](https://github.com/Abir
 - Broadcast Feature.
 - Can Save Watermark Position for users.
 - Can Save Watermark Size for users.
+- Can Upload to [Streamtape](https://streamtape.com/) if File Size is more than 2GB.
 
 ### Demo Bot:
 <a href="https://t.me/VideoWatermark_Bot"><img src="https://img.shields.io/badge/Demo-Telegram%20Bot-blue.svg?logo=telegram"></a>
@@ -28,6 +29,10 @@ A Telegram Video Watermark Adder Bot by [@AbirHasan2005](https://github.com/Abir
 - `UPDATES_CHANNEL` - Force Sub Channel ID *(Optional)*
 - `PRESET` - Video Encoding Preset Type *(Optional)*
 	- Better put `ultrafast` or `superfast` or `veryfast`
+- `STREAMTAPE_API_PASS` - Get this from [Here](https://streamtape.com/accpanel#collapseThree).
+	- For Uploading to Streamtape if File Size is more than 2GB.
+- `STREAMTAPE_API_USERNAME` - Get this from [Here](https://streamtape.com/accpanel#collapseThree).
+	- For Uploading to Streamtape if File Size is more than 2GB.
 
 ## Commands:
 ```
