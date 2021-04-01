@@ -10,6 +10,8 @@ class Config(object):
 	BOT_TOKEN = os.environ.get("BOT_TOKEN")
 	API_ID = int(os.environ.get("API_ID", 12345))
 	API_HASH = os.environ.get("API_HASH")
+	STREAMTAPE_API_PASS = os.environ.get("STREAMTAPE_API_PASS")
+	STREAMTAPE_API_USERNAME = os.environ.get("STREAMTAPE_API_USERNAME")
 	LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL"))
 	UPDATES_CHANNEL = os.environ.get("UPDATES_CHANNEL", None)
 	DOWN_PATH = os.environ.get("DOWN_PATH", "./downloads")

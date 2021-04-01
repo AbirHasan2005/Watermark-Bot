@@ -24,6 +24,7 @@ import traceback
 import random
 import asyncio
 import aiofiles
+import aiohttp
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from PIL import Image
@@ -188,6 +189,16 @@ async def SettingsBot(bot, cmd):
 		size_tag = "15%"
 	elif int(watermark_size) == 20:
 		size_tag = "20%"
+	elif int(watermark_size) == 25:
+		size_tag = "25%"
+	elif int(watermark_size) == 30:
+		size_tag = "30%"
+	elif int(watermark_size) == 35:
+		size_tag = "35%"
+	elif int(watermark_size) == 40:
+		size_tag = "40%"
+	elif int(watermark_size) == 45:
+		size_tag = "45%"
 	else:
 		size_tag = "7%"
 		watermark_size = "7"
@@ -202,7 +213,8 @@ async def SettingsBot(bot, cmd):
 				[InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5"), InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5")],
 				[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
 				[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
-				[InlineKeyboardButton("5%", callback_data=f"size_5"), InlineKeyboardButton("7%", callback_data=f"size_7"), InlineKeyboardButton("10%", callback_data=f"size_10"), InlineKeyboardButton("15%", callback_data=f"size_15"), InlineKeyboardButton("20%", callback_data=f"size_20")]
+				[InlineKeyboardButton("5%", callback_data=f"size_5"), InlineKeyboardButton("7%", callback_data=f"size_7"), InlineKeyboardButton("10%", callback_data=f"size_10"), InlineKeyboardButton("15%", callback_data=f"size_15"), InlineKeyboardButton("20%", callback_data=f"size_20")],
+				[InlineKeyboardButton("25%", callback_data=f"size_25"), InlineKeyboardButton("30%", callback_data=f"size_30"), InlineKeyboardButton("35%", callback_data=f"size_30"), InlineKeyboardButton("40%", callback_data=f"size_40"), InlineKeyboardButton("45%", callback_data=f"size_45")]
 			]
 		)
 	)
@@ -358,6 +370,16 @@ async def VidWatermarkAdder(bot, cmd):
 		size_tag = "15%"
 	elif int(watermark_size) == 20:
 		size_tag = "20%"
+	elif int(watermark_size) == 25:
+		size_tag = "25%"
+	elif int(watermark_size) == 30:
+		size_tag = "30%"
+	elif int(watermark_size) == 35:
+		size_tag = "35%"
+	elif int(watermark_size) == 40:
+		size_tag = "40%"
+	elif int(watermark_size) == 45:
+		size_tag = "45%"
 	else:
 		size_tag = "7%"
 		watermark_size = "7"
@@ -431,9 +453,29 @@ async def VidWatermarkAdder(bot, cmd):
 	sent_vid = None
 	file_size = os.path.getsize(output_vid)
 	if int(file_size) > 2097152000:
-		await editable.edit(f"Sorry Sir,\n\nFile Size Become {humanbytes(file_size)} !!\nI can't Upload to Telegram!")
+		await editable.edit(f"Sorry Sir,\n\nFile Size Become {humanbytes(file_size)} !!\nI can't Upload to Telegram!\n\nSo Now Uploading to Streamtape ...")
+		try:
+			async with aiohttp.ClientSession() as session:
+				Main_API = "https://api.streamtape.com/file/ul?login={}&key={}"
+				hit_api = await session.get(Main_API.format(Config.STREAMTAPE_API_USERNAME, Config.STREAMTAPE_API_PASS))
+				json_data = await hit_api.json()
+				temp_api = json_data["result"]["url"]
+				files = {'file1': open(output_vid, 'rb')}
+				response = await session.post(temp_api, data=files)
+				data_f = await response.json(content_type=None)
+				status = data_f["status"]
+				download_link = data_f["result"]["url"]
+				filename = output_vid.split("/")[-1].replace("_"," ")
+				text_edit = f"File Uploaded to Streamtape!\n\n**File Name:** `{filename}`\n**Size:** `{humanbytes(file_size)}`\n**Link:** `{download_link}`"
+				await editable.edit(text_edit, parse_mode="Markdown", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Open Link", url=download_link)]]))
+				await logs_msg.edit(text_edit, parse_mode="Markdown", disable_web_page_preview=True)
+		except Exception as e:
+			print(f"Error: {e}")
+			await editable.edit("Sorry, Something went wrong!\n\nCan't Upload to Streamtape. You can report at [Support Group](https://t.me/linux_repo)")
+			await logs_msg.edit(f"Got Error While Uploading to Streamtape!\n\nError: {e}")
 		await delete_all()
 		return
+
 	await asyncio.sleep(5)
 	try:
 		c_time = time.time()
@@ -716,6 +758,16 @@ async def button(bot, cmd: CallbackQuery):
 			size_tag = "15%"
 		elif int(watermark_size) == 20:
 			size_tag = "20%"
+		elif int(watermark_size) == 25:
+			size_tag = "25%"
+		elif int(watermark_size) == 30:
+			size_tag = "30%"
+		elif int(watermark_size) == 35:
+			size_tag = "35%"
+		elif int(watermark_size) == 40:
+			size_tag = "40%"
+		elif int(watermark_size) == 45:
+			size_tag = "45%"
 		else:
 			size_tag = "7%"
 			watermark_size = "7"
@@ -730,7 +782,8 @@ async def button(bot, cmd: CallbackQuery):
 						[InlineKeyboardButton("Set Top Left", callback_data=f"position_5:5"), InlineKeyboardButton("Set Top Right", callback_data=f"position_main_w-overlay_w-5:5")],
 						[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
 						[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
-						[InlineKeyboardButton("5%", callback_data=f"size_5"), InlineKeyboardButton("7%", callback_data=f"size_7"), InlineKeyboardButton("10%", callback_data=f"size_10"), InlineKeyboardButton("15%", callback_data=f"size_15"), InlineKeyboardButton("20%", callback_data=f"size_20")]
+						[InlineKeyboardButton("5%", callback_data=f"size_5"), InlineKeyboardButton("7%", callback_data=f"size_7"), InlineKeyboardButton("10%", callback_data=f"size_10"), InlineKeyboardButton("15%", callback_data=f"size_15"), InlineKeyboardButton("20%", callback_data=f"size_20")],
+						[InlineKeyboardButton("25%", callback_data=f"size_25"), InlineKeyboardButton("30%", callback_data=f"size_30"), InlineKeyboardButton("35%", callback_data=f"size_30"), InlineKeyboardButton("40%", callback_data=f"size_40"), InlineKeyboardButton("45%", callback_data=f"size_45")]
 					]
 				)
 			)
