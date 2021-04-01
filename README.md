@@ -13,6 +13,7 @@ A Telegram Video Watermark Adder Bot by [@AbirHasan2005](https://github.com/Abir
 - Broadcast Feature.
 - Can Save Watermark Position for users.
 - Can Save Watermark Size for users.
+- Can Upload to [Streamtape](https://streamtape.com/) if File Size is more than 2GB.
 
 ### Demo Bot:
 <a href="https://t.me/VideoWatermark_Bot"><img src="https://img.shields.io/badge/Demo-Telegram%20Bot-blue.svg?logo=telegram"></a>
@@ -28,18 +29,24 @@ A Telegram Video Watermark Adder Bot by [@AbirHasan2005](https://github.com/Abir
 - `UPDATES_CHANNEL` - Force Sub Channel ID *(Optional)*
 - `PRESET` - Video Encoding Preset Type *(Optional)*
 	- Better put `ultrafast` or `superfast` or `veryfast`
+- `STREAMTAPE_API_PASS` - Get this from [Here](https://streamtape.com/accpanel#collapseThree).
+	- For Uploading to Streamtape if File Size is more than 2GB.
+- `STREAMTAPE_API_USERNAME` - Get this from [Here](https://streamtape.com/accpanel#collapseThree).
+	- For Uploading to Streamtape if File Size is more than 2GB.
 
-## @BotFather Commands:
+## BotFather Commands:
 ```
 start - start the bot
-status - Show number of users in DB
+status - Show number of users in DB & Bot Status
 broadcast - Broadcast replied message to DB Users
+cancel - Cancel Current Task
+settings - User Settings Panel
 ```
 
 ### Support Group:
 <a href="https://t.me/linux_repo"><img src="https://img.shields.io/badge/Telegram-Join%20Telegram%20Group-blue.svg?logo=telegram"></a>
 
-### Deploy Now:
+## Deploy:
 
 #### Easiest Way [Deploy To Heroku] 😪
 
@@ -51,7 +58,7 @@ git clone https://github.com/AbirHasan2005/Watermark-Bot
 cd Watermark-Bot
 virtualenv -p python3 VENV
 . ./VENV/bin/activate
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 --- EDIT configs.py values appropriately ---
 python3 bot.py
 ```
