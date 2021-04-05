@@ -19,6 +19,7 @@ import time
 import shutil
 import math
 import json
+from pyrogram import Client, filters
 import string
 import traceback
 import random
@@ -32,7 +33,6 @@ from datetime import datetime
 from random import choice
 from core.ffmpeg import vidmark, take_screen_shot
 from core.clean import delete_all, delete_trash
-from pyrogram import Client, filters
 from configs import Config
 from core.database import Database
 from core.display_progress import progress_for_pyrogram, humanbytes
