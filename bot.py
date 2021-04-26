@@ -335,7 +335,7 @@ async def VidWatermarkAdder(bot, cmd):
 		if (the_media is None):
 			await delete_trash(status)
 			await delete_trash(the_media)
-			print(f"Download Failed: {err}")
+			print(f"Download Failed")
 			await editable.edit("Unable to Download The Video!")
 			return
 	except Exception as err:
