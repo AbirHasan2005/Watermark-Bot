@@ -13,54 +13,29 @@
 
 
 import os
-import sys
-import json
 import time
-import shutil
-import math
 import json
-import string
-import traceback
 import random
 import asyncio
-import aiofiles
 import aiohttp
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from PIL import Image
-from datetime import datetime
-from random import choice
-from core.ffmpeg import vidmark, take_screen_shot
+from core.ffmpeg import vidmark
 from core.clean import delete_all, delete_trash
 from pyrogram import Client, filters
 from configs import Config
-from core.database import Database
+from core.handlers.main_db_handler import db
 from core.display_progress import progress_for_pyrogram, humanbytes
-from humanfriendly import format_timespan
+from core.handlers.force_sub_handler import handle_force_subscribe
+from core.handlers.upload_video_handler import send_video_handler
+from core.handlers.broadcast_handlers import broadcast_handler
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from pyrogram.errors import InputUserDeactivated, UserIsBlocked
 from pyrogram.errors.exceptions.flood_420 import FloodWait
-from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, UsernameNotOccupied, ChatAdminRequired, PeerIdInvalid, MessageNotModified
+from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, MessageNotModified
 
 AHBot = Client(Config.BOT_USERNAME, bot_token=Config.BOT_TOKEN, api_id=Config.API_ID, api_hash=Config.API_HASH)
-db = Database(Config.DATABASE_URL, Config.BOT_USERNAME)
-broadcast_ids = {}
 
-async def send_msg(user_id, message):
-	try:
-		await message.forward(chat_id=user_id)
-		return 200, None
-	except FloodWait as e:
-		await asyncio.sleep(e.x)
-		return send_msg(user_id, message)
-	except InputUserDeactivated:
-		return 400, f"{user_id} : deactivated\n"
-	except UserIsBlocked:
-		return 400, f"{user_id} : blocked the bot\n"
-	except PeerIdInvalid:
-		return 400, f"{user_id} : user id invalid\n"
-	except Exception as e:
-		return 500, f"{user_id} : {traceback.format_exc()}\n"
 
 
 @AHBot.on_message(filters.command(["start", "help"]) & filters.private)
@@ -72,53 +47,14 @@ async def HelpWatermark(bot, cmd):
 			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
 		)
 	if Config.UPDATES_CHANNEL:
-		invite_link = None
-		try:
-			invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
-		except FloodWait as e:
-			await asyncio.sleep(e.x)
-			return
-		try:
-			user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.from_user.id)
-			if user.status == "kicked":
-				await bot.send_message(
-					chat_id=cmd.from_user.id,
-					text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/linux_repo).",
-					parse_mode="markdown",
-					disable_web_page_preview=True
-				)
-				return
-		except UserNotParticipant:
-			await bot.send_message(
-				chat_id=cmd.from_user.id,
-				text="**Please Join My Updates Channel to use this Bot!**\n\nDue to Overload, Only Channel Subscribers can use the Bot!",
-				reply_markup=InlineKeyboardMarkup(
-					[
-						[
-							InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
-						],
-						[
-							InlineKeyboardButton("🔄 Refresh 🔄", callback_data="refreshmeh")
-						]
-					]
-				),
-				parse_mode="markdown"
-			)
-			return
-		except Exception:
-			await bot.send_message(
-				chat_id=cmd.from_user.id,
-				text="Something went Wrong. Contact my [Support Group](https://t.me/linux_repo).",
-				parse_mode="markdown",
-				disable_web_page_preview=True
-			)
-			return
+		await handle_force_subscribe(bot, cmd)
 	await cmd.reply_text(
 		text=Config.USAGE_WATERMARK_ADDER,
 		parse_mode="Markdown",
 		reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Developer", url="https://t.me/AbirHasan2005"), InlineKeyboardButton("Support Group", url="https://t.me/linux_repo")], [InlineKeyboardButton("Bots Channel", url="https://t.me/Discovery_Updates")], [InlineKeyboardButton("Source Code", url="https://github.com/AbirHasan2005/Watermark-Bot")]]),
 		disable_web_page_preview=True
 	)
+
 
 @AHBot.on_message(filters.command("settings") & filters.private)
 async def SettingsBot(bot, cmd):
@@ -129,42 +65,7 @@ async def SettingsBot(bot, cmd):
 			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
 		)
 	if Config.UPDATES_CHANNEL:
-		invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
-		try:
-			user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.from_user.id)
-			if user.status == "kicked":
-				await bot.send_message(
-					chat_id=cmd.from_user.id,
-					text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/linux_repo).",
-					parse_mode="markdown",
-					disable_web_page_preview=True
-				)
-				return
-		except UserNotParticipant:
-			await bot.send_message(
-				chat_id=cmd.from_user.id,
-				text="**Please Join My Updates Channel to use this Bot!**\n\nDue to Overload, Only Channel Subscribers can use the Bot!",
-				reply_markup=InlineKeyboardMarkup(
-					[
-						[
-							InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
-						],
-						[
-							InlineKeyboardButton("🔄 Refresh 🔄", callback_data="refreshmeh")
-						]
-					]
-				),
-				parse_mode="markdown"
-			)
-			return
-		except Exception:
-			await bot.send_message(
-				chat_id=cmd.from_user.id,
-				text="Something went Wrong. Contact my [Support Group](https://t.me/linux_repo).",
-				parse_mode="markdown",
-				disable_web_page_preview=True
-			)
-			return
+		await handle_force_subscribe(bot, cmd)
 	## --- Checks --- ##
 	position_tag = None
 	watermark_position = await db.get_position(cmd.from_user.id)
@@ -229,44 +130,9 @@ async def VidWatermarkAdder(bot, cmd):
 			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
 		)
 	if Config.UPDATES_CHANNEL:
-		invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
-		try:
-			user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.from_user.id)
-			if user.status == "kicked":
-				await bot.send_message(
-					chat_id=cmd.from_user.id,
-					text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/linux_repo).",
-					parse_mode="markdown",
-					disable_web_page_preview=True
-				)
-				return
-		except UserNotParticipant:
-			await bot.send_message(
-				chat_id=cmd.from_user.id,
-				text="**Please Join My Updates Channel to use this Bot!**\n\nDue to Overload, Only Channel Subscribers can use the Bot!",
-				reply_markup=InlineKeyboardMarkup(
-					[
-						[
-							InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
-						],
-						[
-							InlineKeyboardButton("🔄 Refresh 🔄", callback_data="refreshmeh")
-						]
-					]
-				),
-				parse_mode="markdown"
-			)
-			return
-		except Exception:
-			await bot.send_message(
-				chat_id=cmd.from_user.id,
-				text="Something went Wrong. Contact my [Support Group](https://t.me/linux_repo).",
-				parse_mode="markdown",
-				disable_web_page_preview=True
-			)
-			return
+		await handle_force_subscribe(bot, cmd)
 	## --- Noobie Process --- ##
-	if (cmd.photo or (cmd.document and cmd.document.mime_type.startswith("image/"))):
+	if cmd.photo or (cmd.document and cmd.document.mime_type.startswith("image/")):
 		editable = await cmd.reply_text("Downloading Image ...")
 		dl_loc = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/"
 		watermark_path = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/thumb.jpg"
@@ -332,7 +198,7 @@ async def VidWatermarkAdder(bot, cmd):
 				c_time
 			)
 		)
-		if (the_media is None):
+		if the_media is None:
 			await delete_trash(status)
 			await delete_trash(the_media)
 			print(f"Download Failed")
@@ -402,7 +268,7 @@ async def VidWatermarkAdder(bot, cmd):
 		await logs_msg.edit(f"#ERROR: Unable to add Watermark!\n\n**Error:** `{err}`")
 		await delete_all()
 		return
-	if output_vid == None:
+	if output_vid is None:
 		await editable.edit("Something went wrong!")
 		await logs_msg.edit("#ERROR: Something went wrong!")
 		await delete_all()
@@ -452,7 +318,7 @@ async def VidWatermarkAdder(bot, cmd):
 	# --- Upload --- #
 	sent_vid = None
 	file_size = os.path.getsize(output_vid)
-	if int(file_size) > 2097152000:
+	if (int(file_size) > 2097152000) and (Config.ALLOW_UPLOAD_TO_STREAMTAPE is True) and (Config.STREAMTAPE_API_USERNAME is not "NoNeed") and (Config.STREAMTAPE_API_PASS is not "NoNeed"):
 		await editable.edit(f"Sorry Sir,\n\nFile Size Become {humanbytes(file_size)} !!\nI can't Upload to Telegram!\n\nSo Now Uploading to Streamtape ...")
 		try:
 			async with aiohttp.ClientSession() as session:
@@ -471,56 +337,19 @@ async def VidWatermarkAdder(bot, cmd):
 				await logs_msg.edit(text_edit, parse_mode="Markdown", disable_web_page_preview=True)
 		except Exception as e:
 			print(f"Error: {e}")
-			await editable.edit("Sorry, Something went wrong!\n\nCan't Upload to Streamtape. You can report at [Support Group](https://t.me/linux_repo)")
+			await editable.edit("Sorry, Something went wrong!\n\nCan't Upload to Streamtape. You can report at [Support Group](https://t.me/linux_repo).")
 			await logs_msg.edit(f"Got Error While Uploading to Streamtape!\n\nError: {e}")
 		await delete_all()
 		return
 
 	await asyncio.sleep(5)
 	try:
-		c_time = time.time()
-		sent_vid = await bot.send_video(
-			chat_id=cmd.chat.id,
-			video=output_vid,
-			caption=f"**File Name:** `{output_vid}`\n**Video Duration:** `{format_timespan(duration)}`\n**File Size:** `{humanbytes(file_size)}`\n\n{Config.CAPTION}",
-			thumb=video_thumbnail,
-			duration=duration,
-			width=width,
-			height=height,
-			reply_to_message_id=cmd.message_id,
-			supports_streaming=True,
-			reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Developer", url="https://t.me/AbirHasan2005")], [InlineKeyboardButton("Bots Channel", url="https://t.me/Discovery_Updates")], [InlineKeyboardButton("Support Group", url="https://t.me/linux_repo")]]),
-			progress=progress_for_pyrogram,
-			progress_args=(
-				"Uploading, Wait Sir ...",
-				editable,
-				c_time
-			)
-		)
-	# Any Better Way? :(
+		sent_vid = await send_video_handler(bot, cmd, output_vid, video_thumbnail, duration, width, height, editable, file_size)
 	except FloodWait as e:
 		print(f"Got FloodWait of {e.x}s ...")
 		await asyncio.sleep(e.x)
 		await asyncio.sleep(5)
-		c_time = time.time()
-		sent_vid = await bot.send_video(
-			chat_id=cmd.chat.id,
-			video=output_vid,
-			caption=f"**File Name:** `{output_vid}`\n**Video Duration:** `{format_timespan(duration)}`\n**File Size:** `{humanbytes(file_size)}`\n\n{Config.CAPTION}",
-			thumb=video_thumbnail,
-			duration=duration,
-			width=width,
-			height=height,
-			reply_to_message_id=cmd.message_id,
-			supports_streaming=True,
-			reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Developer", url="https://t.me/AbirHasan2005")], [InlineKeyboardButton("Bots Channel", url="https://t.me/Discovery_Updates")], [InlineKeyboardButton("Support Group", url="https://t.me/linux_repo")]]),
-			progress=progress_for_pyrogram,
-			progress_args=(
-				"Uploading, Wait Sir ...",
-				editable,
-				c_time
-			)
-		)
+		sent_vid = await send_video_handler(bot, cmd, output_vid, video_thumbnail, duration, width, height, editable, file_size)
 	except Exception as err:
 		print(f"Unable to Upload Video: {err}")
 		await logs_msg.edit(f"#ERROR: Unable to Upload Video!\n\n**Error:** `{err}`")
@@ -531,6 +360,7 @@ async def VidWatermarkAdder(bot, cmd):
 	forward_vid = await sent_vid.forward(Config.LOG_CHANNEL)
 	await logs_msg.delete()
 	await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"#WATERMARK_ADDED: Video Uploaded!\n\n{user_info}", reply_to_message_id=forward_vid.message_id, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Ban User", callback_data=f"ban_{cmd.from_user.id}")]]))
+
 
 @AHBot.on_message(filters.command("cancel") & filters.private)
 async def CancelWatermarkAdder(bot, cmd):
@@ -561,70 +391,11 @@ async def CancelWatermarkAdder(bot, cmd):
 		except:
 			pass
 
+
 @AHBot.on_message(filters.private & filters.command("broadcast") & filters.user(Config.OWNER_ID) & filters.reply)
-async def broadcast_(c, m):
-	all_users = await db.get_all_users()
-	broadcast_msg = m.reply_to_message
-	while True:
-	    broadcast_id = ''.join([random.choice(string.ascii_letters) for i in range(3)])
-	    if not broadcast_ids.get(broadcast_id):
-	        break
-	out = await m.reply_text(
-	    text = f"Broadcast Started! You will be notified with log file when all the users are notified."
-	)
-	start_time = time.time()
-	total_users = await db.total_users_count()
-	done = 0
-	failed = 0
-	success = 0
-	broadcast_ids[broadcast_id] = dict(
-	    total = total_users,
-	    current = done,
-	    failed = failed,
-	    success = success
-	)
-	async with aiofiles.open('broadcast.txt', 'w') as broadcast_log_file:
-	    async for user in all_users:
-	        sts, msg = await send_msg(
-	            user_id = int(user['id']),
-	            message = broadcast_msg
-	        )
-	        if msg is not None:
-	            await broadcast_log_file.write(msg)
-	        if sts == 200:
-	            success += 1
-	        else:
-	            failed += 1
-	        if sts == 400:
-	            await db.delete_user(user['id'])
-	        done += 1
-	        if broadcast_ids.get(broadcast_id) is None:
-	            break
-	        else:
-	            broadcast_ids[broadcast_id].update(
-	                dict(
-	                    current = done,
-	                    failed = failed,
-	                    success = success
-	                )
-	            )
-	if broadcast_ids.get(broadcast_id):
-	    broadcast_ids.pop(broadcast_id)
-	completed_in = datetime.timedelta(seconds=int(time.time()-start_time))
-	await asyncio.sleep(3)
-	await out.delete()
-	if failed == 0:
-	    await m.reply_text(
-	        text=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.",
-	        quote=True
-	    )
-	else:
-	    await m.reply_document(
-	        document='broadcast.txt',
-	        caption=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.",
-	        quote=True
-	    )
-	await os.remove('broadcast.txt')
+async def open_broadcast_handler(bot, message):
+	await broadcast_handler(c=bot, m=message)
+
 
 @AHBot.on_message(filters.private & filters.command("status"))
 async def sts(c, m):
@@ -638,6 +409,7 @@ async def sts(c, m):
 		total_users = await db.total_users_count()
 		msg_text += f"\n\n**Total Users in DB:** `{total_users}`"
 	await m.reply_text(text=msg_text, parse_mode="Markdown", quote=True)
+
 
 @AHBot.on_callback_query()
 async def button(bot, cmd: CallbackQuery):
@@ -692,7 +464,7 @@ async def button(bot, cmd: CallbackQuery):
 	elif "lel" in cb_data:
 		await cmd.answer("Sir, that button not works XD\n\nPress Bottom Buttons to Set Size of Watermark", show_alert=True)
 
-	elif (cb_data.startswith("position_") or cb_data.startswith("size_")):
+	elif cb_data.startswith("position_") or cb_data.startswith("size_"):
 		if Config.UPDATES_CHANNEL:
 			invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
 			try:
@@ -791,7 +563,7 @@ async def button(bot, cmd: CallbackQuery):
 			pass
 
 	elif cb_data.startswith("ban_"):
-		if Config.UPDATES_CHANNEL == None:
+		if Config.UPDATES_CHANNEL is None:
 			await cmd.answer("Sorry Sir, You didn't Set any Updates Channel!", show_alert=True)
 			return
 		try:
@@ -800,5 +572,6 @@ async def button(bot, cmd: CallbackQuery):
 			await cmd.answer("User Banned from Updates Channel!", show_alert=True)
 		except Exception as e:
 			await cmd.answer(f"Can't Ban Him!\n\nError: {e}", show_alert=True)
+
 
 AHBot.run()

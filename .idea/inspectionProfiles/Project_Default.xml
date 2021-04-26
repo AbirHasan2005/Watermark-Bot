@@ -1,0 +1,39 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="12">
+            <item index="0" class="java.lang.String" itemvalue="motor" />
+            <item index="1" class="java.lang.String" itemvalue="dnspython" />
+            <item index="2" class="java.lang.String" itemvalue="pyrogram" />
+            <item index="3" class="java.lang.String" itemvalue="hachoir" />
+            <item index="4" class="java.lang.String" itemvalue="aiofiles" />
+            <item index="5" class="java.lang.String" itemvalue="aiohttp" />
+            <item index="6" class="java.lang.String" itemvalue="TgCrypto" />
+            <item index="7" class="java.lang.String" itemvalue="humanfriendly" />
+            <item index="8" class="java.lang.String" itemvalue="Pillow" />
+            <item index="9" class="java.lang.String" itemvalue="psutil" />
+            <item index="10" class="java.lang.String" itemvalue="youtube-dl" />
+            <item index="11" class="java.lang.String" itemvalue="Pyrogram" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E266" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="pyrogram.InlineKeyboardButton" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
