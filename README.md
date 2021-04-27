@@ -52,6 +52,9 @@ settings - User Settings Panel
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/AbirHasan2005/Watermark-Bot)
 
+#### Video Tutorial:
+[![YouTube](https://img.shields.io/badge/YouTube-Video%20Tutorial-red?logo=youtube)](https://www.youtube.com/watch?v=A7wnaKMHpvU&t)
+
 #### The Hard Way 🤕
 ```sh
 git clone https://github.com/AbirHasan2005/Watermark-Bot
