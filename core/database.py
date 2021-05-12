@@ -13,7 +13,8 @@ class Database:
         return dict(
             id = id,
             join_date = datetime.date.today().isoformat(),
-            watermark_position = "5:5"
+            watermark_position = "5:5",
+            watermark_size = "7"
         )
     async def add_user(self, id):
         user = self.new_user(id)
