@@ -1,4 +1,4 @@
-# (c) @AbirHasan2005
+# (c) @doreamonfans1
 
 # Don't Forget That I Made This!
 # So Give Credits!
@@ -18,7 +18,7 @@ class Config(object):
 	DOWN_PATH = os.environ.get("DOWN_PATH", "./downloads")
 	PRESET = os.environ.get("PRESET", "ultrafast")
 	OWNER_ID = int(os.environ.get("OWNER_ID", 1445283714))
-	CAPTION = "By @AHToolsBot"
+	CAPTION = "By @doreamonfans1"
 	BOT_USERNAME = os.environ.get("BOT_USERNAME", "VideoWatermark_Bot")
 	DATABASE_URL = os.environ.get("DATABASE_URL")
 	BROADCAST_AS_COPY = bool(os.environ.get("BROADCAST_AS_COPY", False))
@@ -29,9 +29,9 @@ Hi, I am Video Watermark Adder Bot!
 **How to Added Watermark to a Video?**
 **Usage:** First Send a JPG Image/Logo, then send any Video. Better add watermark to a MP4 or MKV Video.
 
-__Note: I can only process one video at a time. As my server is Heroku, my health is not good. If you have any issues with Adding Watermark to a Video, then please Report at [Support Group](https://t.me/linux_repo).__
+__Note: I can only process one video at a time. As my server is Heroku, my health is not good. If you have any issues with Adding Watermark to a Video, then please Report at [Support Group](https://t.me/disneyteamchat).__
 
-Desgined by @AbirHasan2005
+Project by @disneygrou
 """
 	PROGRESS = """
 Percentage : {0}%
