@@ -1,4 +1,4 @@
-# (c) @AbirHasan2005
+# (c) @doreamonfans1
 
 # This is Telegram Video Watermark Adder Bot's Source Code.
 # I Hardly Made This. So Don't Forget to Give Me Credits.
@@ -8,8 +8,8 @@
 # Edit anything at your own risk!
 
 # Don't forget to help me if I done any mistake in the codes.
-# Support Group: @linux_repo 
-# Bots Channel: @Discovery_Updates
+# Support Group: @disneyteamchat
+# Bots Channel: @disneygrou
 
 import os
 import math
