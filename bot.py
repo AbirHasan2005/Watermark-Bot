@@ -47,7 +47,9 @@ async def HelpWatermark(bot, cmd):
 			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
 		)
 	if Config.UPDATES_CHANNEL:
-		await handle_force_subscribe(bot, cmd)
+		fsub = await handle_force_subscribe(bot, cmd)
+		if fsub == 400:
+			return
 	await cmd.reply_text(
 		text=Config.USAGE_WATERMARK_ADDER,
 		parse_mode="Markdown",
@@ -65,7 +67,9 @@ async def SettingsBot(bot, cmd):
 			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
 		)
 	if Config.UPDATES_CHANNEL:
-		await handle_force_subscribe(bot, cmd)
+		fsub = await handle_force_subscribe(bot, cmd)
+		if fsub == 400:
+			return
 	## --- Checks --- ##
 	position_tag = None
 	watermark_position = await db.get_position(cmd.from_user.id)
@@ -130,7 +134,9 @@ async def VidWatermarkAdder(bot, cmd):
 			f"#NEW_USER: \n\nNew User [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) started @{Config.BOT_USERNAME} !!"
 		)
 	if Config.UPDATES_CHANNEL:
-		await handle_force_subscribe(bot, cmd)
+		fsub = await handle_force_subscribe(bot, cmd)
+		if fsub == 400:
+			return
 	## --- Noobie Process --- ##
 	if cmd.photo or (cmd.document and cmd.document.mime_type.startswith("image/")):
 		editable = await cmd.reply_text("Downloading Image ...")
