@@ -12,7 +12,7 @@ async def handle_force_subscribe(bot, cmd):
         invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
     except FloodWait as e:
         await asyncio.sleep(e.x)
-        return
+        return 400
     try:
         user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.from_user.id)
         if user.status == "kicked":
@@ -22,7 +22,7 @@ async def handle_force_subscribe(bot, cmd):
                 parse_mode="markdown",
                 disable_web_page_preview=True
             )
-            return
+            return 400
     except UserNotParticipant:
         await bot.send_message(
             chat_id=cmd.from_user.id,
@@ -39,7 +39,7 @@ async def handle_force_subscribe(bot, cmd):
             ),
             parse_mode="markdown"
         )
-        return
+        return 400
     except Exception:
         await bot.send_message(
             chat_id=cmd.from_user.id,
@@ -47,4 +47,4 @@ async def handle_force_subscribe(bot, cmd):
             parse_mode="markdown",
             disable_web_page_preview=True
         )
-        return
+        return 400
