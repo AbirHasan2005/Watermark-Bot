@@ -7,7 +7,6 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 async def handle_force_subscribe(bot, cmd):
-    invite_link = None
     try:
         invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
     except FloodWait as e:

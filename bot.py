@@ -37,7 +37,6 @@ from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, Messa
 AHBot = Client(Config.BOT_USERNAME, bot_token=Config.BOT_TOKEN, api_id=Config.API_ID, api_hash=Config.API_HASH)
 
 
-
 @AHBot.on_message(filters.command(["start", "help"]) & filters.private)
 async def HelpWatermark(bot, cmd):
 	if not await db.is_user_exist(cmd.from_user.id):
@@ -82,7 +81,6 @@ async def SettingsBot(bot, cmd):
 	elif watermark_position == "5:5":
 		position_tag = "Top Left"
 
-	size_tag = None
 	watermark_size = await db.get_size(cmd.from_user.id)
 	if int(watermark_size) == 5:
 		size_tag = "5%"
@@ -106,7 +104,6 @@ async def SettingsBot(bot, cmd):
 		size_tag = "45%"
 	else:
 		size_tag = "7%"
-		watermark_size = "7"
 	## --- Next --- ##
 	await cmd.reply_text(
 		text="Here you can set your Watermark Settings:",
@@ -140,11 +137,10 @@ async def VidWatermarkAdder(bot, cmd):
 	## --- Noobie Process --- ##
 	if cmd.photo or (cmd.document and cmd.document.mime_type.startswith("image/")):
 		editable = await cmd.reply_text("Downloading Image ...")
-		dl_loc = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/"
 		watermark_path = Config.DOWN_PATH + "/" + str(cmd.from_user.id) + "/thumb.jpg"
 		await asyncio.sleep(5)
 		c_time = time.time()
-		the_media = await bot.download_media(
+		await bot.download_media(
 			message=cmd,
 			file_name=watermark_path,
 			progress=progress_for_pyrogram,
@@ -186,7 +182,6 @@ async def VidWatermarkAdder(bot, cmd):
 	if not os.path.isdir(dl_loc):
 		os.makedirs(dl_loc)
 	the_media = None
-	logs_msg = None
 	user_info = f"**UserID:** #id{cmd.from_user.id}\n**Name:** [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id})"
 	## --- Done --- ##
 	try:
@@ -201,6 +196,7 @@ async def VidWatermarkAdder(bot, cmd):
 			progress_args=(
 				"Downloading Sir ...",
 				editable,
+				logs_msg,
 				c_time
 			)
 		)
@@ -216,7 +212,6 @@ async def VidWatermarkAdder(bot, cmd):
 		print(f"Download Failed: {err}")
 		await editable.edit("Unable to Download The Video!")
 		return
-	position_tag = None
 	watermark_position = await db.get_position(cmd.from_user.id)
 	if watermark_position == "5:main_h-overlay_h":
 		position_tag = "Bottom Left"
@@ -230,31 +225,7 @@ async def VidWatermarkAdder(bot, cmd):
 		position_tag = "Top Left"
 		watermark_position = "5:5"
 
-	size_tag = None
 	watermark_size = await db.get_size(cmd.from_user.id)
-	if int(watermark_size) == 5:
-		size_tag = "5%"
-	elif int(watermark_size) == 7:
-		size_tag = "7%"
-	elif int(watermark_size) == 10:
-		size_tag = "10%"
-	elif int(watermark_size) == 15:
-		size_tag = "15%"
-	elif int(watermark_size) == 20:
-		size_tag = "20%"
-	elif int(watermark_size) == 25:
-		size_tag = "25%"
-	elif int(watermark_size) == 30:
-		size_tag = "30%"
-	elif int(watermark_size) == 35:
-		size_tag = "35%"
-	elif int(watermark_size) == 40:
-		size_tag = "40%"
-	elif int(watermark_size) == 45:
-		size_tag = "45%"
-	else:
-		size_tag = "7%"
-		watermark_size = "7"
 	await editable.edit(f"Trying to Add Watermark to the Video at {position_tag} Corner ...\n\nPlease Wait!")
 	duration = 0
 	metadata = extractMetadata(createParser(the_media))
@@ -265,8 +236,6 @@ async def VidWatermarkAdder(bot, cmd):
 	output_vid = main_file_name + "_[" + str(cmd.from_user.id) + "]_[" + str(time.time()) + "]_[@AbirHasan2005]" + ".mp4"
 	progress = Config.DOWN_PATH + "/WatermarkAdder/" + str(cmd.from_user.id) + "/progress.txt"
 	try:
-		# WOW! Nice XD
-		# Meh Always NOOB
 		output_vid = await vidmark(the_media, editable, progress, watermark_path, output_vid, duration, logs_msg, status, preset, watermark_position, watermark_size)
 	except Exception as err:
 		print(f"Unable to Add Watermark: {err}")
@@ -322,7 +291,6 @@ async def VidWatermarkAdder(bot, cmd):
 	except Exception as err:
 		print(f"Error: {err}")
 	# --- Upload --- #
-	sent_vid = None
 	file_size = os.path.getsize(output_vid)
 	if (int(file_size) > 2097152000) and (Config.ALLOW_UPLOAD_TO_STREAMTAPE is True) and (Config.STREAMTAPE_API_USERNAME != "NoNeed") and (Config.STREAMTAPE_API_PASS != "NoNeed"):
 		await editable.edit(f"Sorry Sir,\n\nFile Size Become {humanbytes(file_size)} !!\nI can't Upload to Telegram!\n\nSo Now Uploading to Streamtape ...")
@@ -335,12 +303,11 @@ async def VidWatermarkAdder(bot, cmd):
 				files = {'file1': open(output_vid, 'rb')}
 				response = await session.post(temp_api, data=files)
 				data_f = await response.json(content_type=None)
-				status = data_f["status"]
 				download_link = data_f["result"]["url"]
 				filename = output_vid.split("/")[-1].replace("_"," ")
 				text_edit = f"File Uploaded to Streamtape!\n\n**File Name:** `{filename}`\n**Size:** `{humanbytes(file_size)}`\n**Link:** `{download_link}`"
 				await editable.edit(text_edit, parse_mode="Markdown", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Open Link", url=download_link)]]))
-				await logs_msg.edit(text_edit, parse_mode="Markdown", disable_web_page_preview=True)
+				await logs_msg.edit("Successfully Uploaded File to Streamtape!\n\nI am Free Now!", parse_mode="Markdown", disable_web_page_preview=True)
 		except Exception as e:
 			print(f"Error: {e}")
 			await editable.edit("Sorry, Something went wrong!\n\nCan't Upload to Streamtape. You can report at [Support Group](https://t.me/linux_repo).")
@@ -350,12 +317,12 @@ async def VidWatermarkAdder(bot, cmd):
 
 	await asyncio.sleep(5)
 	try:
-		sent_vid = await send_video_handler(bot, cmd, output_vid, video_thumbnail, duration, width, height, editable, file_size)
+		sent_vid = await send_video_handler(bot, cmd, output_vid, video_thumbnail, duration, width, height, editable, logs_msg, file_size)
 	except FloodWait as e:
 		print(f"Got FloodWait of {e.x}s ...")
 		await asyncio.sleep(e.x)
 		await asyncio.sleep(5)
-		sent_vid = await send_video_handler(bot, cmd, output_vid, video_thumbnail, duration, width, height, editable, file_size)
+		sent_vid = await send_video_handler(bot, cmd, output_vid, video_thumbnail, duration, width, height, editable, logs_msg, file_size)
 	except Exception as err:
 		print(f"Unable to Upload Video: {err}")
 		await logs_msg.edit(f"#ERROR: Unable to Upload Video!\n\n**Error:** `{err}`")
@@ -404,8 +371,7 @@ async def open_broadcast_handler(bot, message):
 
 
 @AHBot.on_message(filters.private & filters.command("status"))
-async def sts(c, m):
-	msg_text = None
+async def sts(_, m):
 	status = Config.DOWN_PATH + "/WatermarkAdder/status.json"
 	if os.path.exists(status):
 		msg_text = "Sorry, Currently I am busy with another Task!\nI can't add Watermark at this moment."
@@ -419,9 +385,7 @@ async def sts(c, m):
 
 @AHBot.on_callback_query()
 async def button(bot, cmd: CallbackQuery):
-	# Meh Lazy AF ...
 	cb_data = cmd.data
-
 	if "refreshmeh" in cb_data:
 		if Config.UPDATES_CHANNEL:
 			invite_link = await bot.create_chat_invite_link(int(Config.UPDATES_CHANNEL))
@@ -511,7 +475,6 @@ async def button(bot, cmd: CallbackQuery):
 			await db.set_position(cmd.from_user.id, new_position)
 		elif cb_data.startswith("size_"):
 			await db.set_size(cmd.from_user.id, new_position)
-		position_tag = None
 		watermark_position = await db.get_position(cmd.from_user.id)
 		if watermark_position == "5:main_h-overlay_h":
 			position_tag = "Bottom Left"
@@ -524,7 +487,6 @@ async def button(bot, cmd: CallbackQuery):
 		else:
 			position_tag = "Top Left"
 
-		size_tag = None
 		watermark_size = await db.get_size(cmd.from_user.id)
 		if int(watermark_size) == 5:
 			size_tag = "5%"
@@ -548,7 +510,6 @@ async def button(bot, cmd: CallbackQuery):
 			size_tag = "45%"
 		else:
 			size_tag = "7%"
-			watermark_size = "7"
 		try:
 			await cmd.message.edit(
 				text="Here you can set your Watermark Settings:",

@@ -7,7 +7,7 @@ from core.display_progress import progress_for_pyrogram, humanbytes
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-async def send_video_handler(bot, cmd, output_vid, video_thumbnail, duration, width, height, editable, file_size):
+async def send_video_handler(bot, cmd, output_vid, video_thumbnail, duration, width, height, editable, logs_msg, file_size):
     c_time = time.time()
     sent_vid = await bot.send_video(
         chat_id=cmd.chat.id,
@@ -26,6 +26,7 @@ async def send_video_handler(bot, cmd, output_vid, video_thumbnail, duration, wi
         progress_args=(
             "Uploading, Wait Sir ...",
             editable,
+            logs_msg,
             c_time
         )
     )
