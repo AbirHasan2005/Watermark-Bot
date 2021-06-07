@@ -143,12 +143,6 @@ async def VidWatermarkAdder(bot, cmd):
 		await bot.download_media(
 			message=cmd,
 			file_name=watermark_path,
-			progress=progress_for_pyrogram,
-			progress_args=(
-				"Downloading Sir ...",
-				editable,
-				c_time
-			)
 		)
 		await editable.delete()
 		await cmd.reply_text("This Saved as Next Video Watermark!\n\nNow Send any Video to start adding Watermark to the Video!")
