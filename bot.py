@@ -435,7 +435,7 @@ async def button(bot, cmd: CallbackQuery):
 				user = await bot.get_chat_member(int(Config.UPDATES_CHANNEL), cmd.message.chat.id)
 				if user.status == "kicked":
 					await cmd.message.edit(
-						text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/linux_repo).",
+						text="Sorry Sir, You are Banned to use me. Contact my [Support Group](https://t.me/DevsZone).",
 						parse_mode="markdown",
 						disable_web_page_preview=True
 					)
@@ -458,12 +458,11 @@ async def button(bot, cmd: CallbackQuery):
 				return
 			except Exception:
 				await cmd.message.edit(
-					text="Something went Wrong. Contact my [Support Group](https://telegram.me/DevsZone).",
+					text="Something went Wrong. Contact my [Support Group](https://t.me/DevsZone).",
 					parse_mode="markdown",
 					disable_web_page_preview=True
 				)
 				return
-
 		await bot.send_message(chat_id=Config.LOG_CHANNEL, text=f"#SETTINGS_SET: [{cmd.from_user.first_name}](tg://user?id={cmd.from_user.id}) Changed Settings!\n\n**User ID:** #id{cmd.from_user.id}\n**Data:** `{cb_data}`", parse_mode="Markdown", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Ban User", callback_data=f"ban_{cmd.from_user.id}")]]))
 		new_position = cb_data.split("_", 1)[1]
 		if cb_data.startswith("position_"):
