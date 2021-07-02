@@ -450,7 +450,7 @@ async def button(bot, cmd: CallbackQuery):
 				return
 			except Exception:
 				await cmd.message.edit(
-					text="Something went Wrong. Contact my [Fayas](https://telegram.me/TheFayas.",
+					text="Something went Wrong. Contact my [Support Group](https://telegram.me/DevsZone).",
 					parse_mode="markdown",
 					disable_web_page_preview=True
 				)
