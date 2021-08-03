@@ -57,6 +57,13 @@ async def HelpWatermark(bot, cmd):
 	)
 
 
+@AHBot.on_message(filters.command(["reset"]) & filters.private)
+async def reset(bot, update):
+        await db.delete_user(update.from_user.id)
+        await db.add_user(update.from_user.id)
+        await update.reply_text("Settings reseted successfully")
+
+
 @AHBot.on_message(filters.command("settings") & filters.private)
 async def SettingsBot(bot, cmd):
 	if not await db.is_user_exist(cmd.from_user.id):
