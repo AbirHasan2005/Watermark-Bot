@@ -41,6 +41,7 @@ status - Show number of users in DB & Bot Status
 broadcast - Broadcast replied message to DB Users
 cancel - Cancel Current Task
 settings - User Settings Panel
+reset - Reset all settings to default
 ```
 
 ### Support Group:
