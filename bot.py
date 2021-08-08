@@ -57,13 +57,6 @@ async def HelpWatermark(bot, cmd):
 	)
 
 
-@AHBot.on_message(filters.command(["reset"]) & filters.private)
-async def reset(bot, update):
-        await db.delete_user(update.from_user.id)
-        await db.add_user(update.from_user.id)
-        await update.reply_text("Settings reseted successfully")
-
-
 @AHBot.on_message(filters.command("settings") & filters.private)
 async def SettingsBot(bot, cmd):
 	if not await db.is_user_exist(cmd.from_user.id):
@@ -123,7 +116,8 @@ async def SettingsBot(bot, cmd):
 				[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
 				[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
 				[InlineKeyboardButton("5%", callback_data=f"size_5"), InlineKeyboardButton("7%", callback_data=f"size_7"), InlineKeyboardButton("10%", callback_data=f"size_10"), InlineKeyboardButton("15%", callback_data=f"size_15"), InlineKeyboardButton("20%", callback_data=f"size_20")],
-				[InlineKeyboardButton("25%", callback_data=f"size_25"), InlineKeyboardButton("30%", callback_data=f"size_30"), InlineKeyboardButton("35%", callback_data=f"size_30"), InlineKeyboardButton("40%", callback_data=f"size_40"), InlineKeyboardButton("45%", callback_data=f"size_45")]
+				[InlineKeyboardButton("25%", callback_data=f"size_25"), InlineKeyboardButton("30%", callback_data=f"size_30"), InlineKeyboardButton("35%", callback_data=f"size_30"), InlineKeyboardButton("40%", callback_data=f"size_40"), InlineKeyboardButton("45%", callback_data=f"size_45")],
+				[InlineKeyboardButton(f"Reset Settings To Default", callback_data="reset")]
 			]
 		)
 	)
@@ -523,7 +517,8 @@ async def button(bot, cmd: CallbackQuery):
 						[InlineKeyboardButton("Set Bottom Left", callback_data=f"position_5:main_h-overlay_h"), InlineKeyboardButton("Set Bottom Right", callback_data=f"position_main_w-overlay_w-5:main_h-overlay_h-5")],
 						[InlineKeyboardButton(f"Watermark Size - {size_tag}", callback_data="lel")],
 						[InlineKeyboardButton("5%", callback_data=f"size_5"), InlineKeyboardButton("7%", callback_data=f"size_7"), InlineKeyboardButton("10%", callback_data=f"size_10"), InlineKeyboardButton("15%", callback_data=f"size_15"), InlineKeyboardButton("20%", callback_data=f"size_20")],
-						[InlineKeyboardButton("25%", callback_data=f"size_25"), InlineKeyboardButton("30%", callback_data=f"size_30"), InlineKeyboardButton("35%", callback_data=f"size_30"), InlineKeyboardButton("40%", callback_data=f"size_40"), InlineKeyboardButton("45%", callback_data=f"size_45")]
+						[InlineKeyboardButton("25%", callback_data=f"size_25"), InlineKeyboardButton("30%", callback_data=f"size_30"), InlineKeyboardButton("35%", callback_data=f"size_30"), InlineKeyboardButton("40%", callback_data=f"size_40"), InlineKeyboardButton("45%", callback_data=f"size_45")],
+				                [InlineKeyboardButton(f"Reset Settings To Default", callback_data="reset")]
 					]
 				)
 			)
@@ -540,6 +535,11 @@ async def button(bot, cmd: CallbackQuery):
 			await cmd.answer("User Banned from Updates Channel!", show_alert=True)
 		except Exception as e:
 			await cmd.answer(f"Can't Ban Him!\n\nError: {e}", show_alert=True)
+
+	elif "reset" in cb_data:
+		await db.delete_user(cmd.from_user.id)
+		await db.add_user(cmd.from_user.id)
+		await cmd.answer("Settings Reseted Successfully!", show_alert=True)
 
 
 AHBot.run()
