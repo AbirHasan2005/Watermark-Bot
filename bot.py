@@ -1,4 +1,4 @@
-# (c) @AbirHasan2005
+# (c) @Try24x7
 
 # This is Telegram Video Watermark Adder Bot's Source Code.
 # I Hardly Made This. So Don't Forget to Give Me Credits.
@@ -8,8 +8,8 @@
 # Edit anything at your own risk!
 
 # Don't forget to help me if I done any mistake in the codes.
-# Support Group: @DevsZone 
-# Bots Channel: @Discovery_Updates
+# Support Group: @infinitepdisk
+# Bots Channel: @infinitepdisk
 
 
 import os
@@ -37,7 +37,7 @@ from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, Messa
 AHBot = Client(Config.BOT_USERNAME, bot_token=Config.BOT_TOKEN, api_id=Config.API_ID, api_hash=Config.API_HASH)
 
 
-@AHBot.on_message(filters.command(["start", "help"]) & filters.private)
+@YasirBot.on_message(filters.command(["start", "help"]) & filters.private)
 async def HelpWatermark(bot, cmd):
 	if not await db.is_user_exist(cmd.from_user.id):
 		await db.add_user(cmd.from_user.id)
