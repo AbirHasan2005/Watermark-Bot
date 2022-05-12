@@ -130,7 +130,7 @@ async def SettingsBot(bot, cmd):
 	)
 
 
-@AHBot.on_message(filters.document | filters.video | filters.photo & filters.private)
+@AHBot.on_message((filters.document | filters.video | filters.photo) & filters.private)
 async def VidWatermarkAdder(bot, cmd):
 	if not await db.is_user_exist(cmd.from_user.id):
 		await db.add_user(cmd.from_user.id)
