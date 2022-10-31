@@ -29,7 +29,7 @@ async def vidmark(the_media, message, working_dir, watermark_path, output_vid, t
     file_genertor_command = [
         "ffmpeg", "-hide_banner", "-loglevel", "quiet", "-progress", working_dir, "-i", the_media, "-i", watermark_path,
         "-filter_complex", f"[1][0]scale2ref=w='iw*{size}/100':h='ow/mdar'[wm][vid];[vid][wm]overlay={position}",
-        "-c:v", "h264", "-preset", mode, "-crf", "0" "-tune", "film", "-c:a", "copy", output_vid
+        "-c:v", "copy", "-preset", mode, "-crf", "0", "-c:a", "copy", output_vid
     ]
     COMPRESSION_START_TIME = time.time()
     process = await asyncio.create_subprocess_exec(
